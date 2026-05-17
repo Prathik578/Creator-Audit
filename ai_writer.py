@@ -97,6 +97,53 @@ def _parse_response(text: str, full_name: str, username: str) -> dict:
     }
 
 
+def rewrite_and_humanise_hook(hook: str) -> str:
+    client = _get_client()
+    if not client:
+        return f"[AI unavailable] Could not rewrite: {hook}"
+
+    rewrite_prompt = f"""You are a viral Instagram content expert. Rewrite the following weak hook into a powerful, scroll-stopping opening line.
+
+Rules:
+- Keep it under 15 words
+- Use one of these proven formats: curiosity gap, bold claim, direct question, contrarian statement, or numbered list opener
+- Make it feel punchy and urgent
+- Do NOT explain yourself, just write the hook
+
+Original hook: "{hook}"
+
+Rewritten hook:"""
+
+    try:
+        rewrite_response = client.models.generate_content(
+            model="gemini-1.5-flash",
+            contents=rewrite_prompt,
+        )
+        rewritten = rewrite_response.text.strip().strip('"').strip("'")
+
+        humanise_prompt = f"""Take this AI-generated hook and rewrite it so it sounds completely natural and human — like a real creator typed it, not a robot.
+
+Rules:
+- Remove any phrases that sound corporate, over-polished, or like marketing copy
+- Make it feel casual, direct, and genuine
+- Keep the same message and power but make it conversational
+- Do NOT add explanations, just return the final hook text only
+- Keep it under 15 words
+
+AI hook: "{rewritten}"
+
+Human version:"""
+
+        human_response = client.models.generate_content(
+            model="gemini-1.5-flash",
+            contents=humanise_prompt,
+        )
+        return human_response.text.strip().strip('"').strip("'")
+
+    except Exception:
+        return f"Rewrite failed for: {hook}"
+
+
 def _fallback_insights(profile: dict, analysis: dict) -> dict:
     username = profile.get("username", "")
     full_name = profile.get("full_name", "") or f"@{username}"

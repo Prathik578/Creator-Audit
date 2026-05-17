@@ -7,7 +7,7 @@ from datetime import datetime
 from urllib.parse import quote
 from analyzer import analyze_profile
 from report_generator import generate_report_html
-from ai_writer import generate_ai_insights
+from ai_writer import generate_ai_insights, rewrite_and_humanise_hook
 
 app = Flask(__name__)
 
@@ -133,11 +133,25 @@ def report():
     profiles = data.get("profiles", [])
     if not profiles:
         return jsonify({"error": "No profile data provided"}), 400
-    html = generate_report_html(profiles)
+    base_url = request.host_url.rstrip("/")
+    html = generate_report_html(profiles, base_url=base_url)
     buf = io.BytesIO(html.encode("utf-8"))
     buf.seek(0)
     filename = f"instagram_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
     return send_file(buf, mimetype="text/html", as_attachment=True, download_name=filename)
+
+
+@app.route("/api/rewrite-hook", methods=["POST"])
+def rewrite_hook():
+    data = request.get_json()
+    hooks = data.get("hooks", [])
+    if not hooks:
+        return jsonify({"error": "No hooks provided"}), 400
+    results = []
+    for hook in hooks[:5]:
+        rewritten = rewrite_and_humanise_hook(hook)
+        results.append({"original": hook, "rewritten": rewritten})
+    return jsonify({"results": results})
 
 
 if __name__ == "__main__":

@@ -1,25 +1,39 @@
 from datetime import datetime
+import json
 
 
-def generate_report_html(profiles: list) -> str:
+def generate_report_html(profiles: list, base_url: str = "") -> str:
     date_str = datetime.now().strftime("%B %d, %Y")
     cards_html = ""
+
+    all_hooks_by_profile = []
 
     for p in profiles:
         analysis = p.get("analysis", {})
         ai = p.get("ai_insights", {})
+        username = p.get("username", "unknown")
 
         issues_html = "".join(f'<li>{i}</li>' for i in analysis.get("top_issues", []))
         hooks_html = ""
+        profile_hooks = []
         for hb in analysis.get("hook_breakdown", [])[:4]:
             score = hb.get("score", 0)
+            hook_text = hb.get("hook", "")
             color = "#22c55e" if score >= 70 else "#f59e0b" if score >= 45 else "#ef4444"
             hooks_html += f"""
             <div class="hook-item">
-                <div class="hook-text">"{hb.get('hook', 'N/A')}"</div>
+                <div class="hook-text">"{hook_text}"</div>
                 <div class="hook-score" style="color:{color}">Score: {score}/100</div>
                 {'<div class="hook-issue">' + hb["issues"][0] + '</div>' if hb.get("issues") else ''}
             </div>"""
+            if hook_text:
+                profile_hooks.append(hook_text)
+
+        if profile_hooks:
+            all_hooks_by_profile.append({
+                "username": username,
+                "hooks": profile_hooks,
+            })
 
         ideas_html = ""
         for idea in ai.get("content_ideas", []):
@@ -44,9 +58,9 @@ def generate_report_html(profiles: list) -> str:
         <div class="profile-card">
             <div class="card-header">
                 <div class="profile-info">
-                    <div class="avatar">@{p.get('username', '?')[0].upper()}</div>
+                    <div class="avatar">{username[0].upper()}</div>
                     <div>
-                        <h2>@{p.get('username', 'unknown')}</h2>
+                        <h2>@{username}</h2>
                         <p class="full-name">{p.get('full_name', '')}</p>
                     </div>
                 </div>
@@ -101,6 +115,8 @@ def generate_report_html(profiles: list) -> str:
             </div>
         </div>"""
 
+    hook_rewriter_section = _build_hook_rewriter(all_hooks_by_profile, base_url)
+
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -148,6 +164,32 @@ def generate_report_html(profiles: list) -> str:
   .pitch-box h3 {{ font-size: 0.95rem; font-weight: 700; color: #5b21b6; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }}
   .pitch-text {{ font-size: 0.92rem; color: #4c1d95; line-height: 1.7; }}
   .report-footer {{ text-align: center; padding: 40px 20px; color: #94a3b8; font-size: 0.85rem; }}
+
+  /* Hook Rewriter */
+  .rewriter-section {{ background: #0f0f13; border-radius: 20px; margin: 40px 0; overflow: hidden; }}
+  .rewriter-header {{ background: linear-gradient(135deg, #7c3aed, #6366f1); padding: 28px 32px; }}
+  .rewriter-header h2 {{ color: white; font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }}
+  .rewriter-header p {{ color: rgba(255,255,255,0.75); font-size: 0.875rem; }}
+  .rewriter-body {{ padding: 28px 32px; }}
+  .profile-group {{ margin-bottom: 24px; }}
+  .profile-group-label {{ font-size: 0.75rem; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 12px; }}
+  .hook-checkbox-item {{ display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; background: #18181f; border: 1px solid #2a2a38; border-radius: 10px; margin-bottom: 8px; cursor: pointer; transition: border-color 0.2s; }}
+  .hook-checkbox-item:hover {{ border-color: #6366f1; }}
+  .hook-checkbox-item input[type="checkbox"] {{ margin-top: 2px; accent-color: #7c3aed; width: 16px; height: 16px; flex-shrink: 0; cursor: pointer; }}
+  .hook-checkbox-label {{ font-size: 0.875rem; color: #94a3b8; font-style: italic; line-height: 1.5; cursor: pointer; }}
+  .rewrite-btn {{ width: 100%; padding: 16px; background: linear-gradient(135deg, #7c3aed, #6366f1); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 8px; transition: all 0.2s; font-family: inherit; }}
+  .rewrite-btn:hover:not(:disabled) {{ transform: translateY(-1px); box-shadow: 0 8px 32px rgba(124,58,237,0.4); }}
+  .rewrite-btn:disabled {{ opacity: 0.6; cursor: not-allowed; transform: none; }}
+  .rewrite-spinner {{ display: none; text-align: center; padding: 20px; color: #6366f1; font-size: 0.9rem; }}
+  .results-area {{ margin-top: 24px; display: none; }}
+  .result-card {{ background: #18181f; border: 1px solid #2a2a38; border-radius: 12px; padding: 20px; margin-bottom: 16px; }}
+  .result-original {{ font-size: 0.78rem; color: #4a4a5e; font-style: italic; margin-bottom: 12px; }}
+  .result-original span {{ color: #64748b; }}
+  .result-label {{ font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #7c3aed; margin-bottom: 8px; }}
+  .result-text {{ font-size: 1rem; font-weight: 600; color: #f1f5f9; line-height: 1.5; }}
+  .copy-result-btn {{ margin-top: 12px; padding: 6px 14px; background: rgba(124,58,237,0.2); border: 1px solid rgba(124,58,237,0.4); color: #a78bfa; border-radius: 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; }}
+  .copy-result-btn:hover {{ background: rgba(124,58,237,0.35); }}
+  .no-selection-msg {{ color: #ef4444; font-size: 0.85rem; margin-top: 8px; display: none; text-align: center; }}
 </style>
 </head>
 <body>
@@ -162,12 +204,112 @@ def generate_report_html(profiles: list) -> str:
 </div>
 <div class="container">
   {cards_html}
+  {hook_rewriter_section}
 </div>
 <div class="report-footer">
   <p>Generated by CreatorAudit — AI-Powered Instagram Lead Intelligence</p>
 </div>
 </body>
 </html>"""
+
+
+def _build_hook_rewriter(hooks_by_profile: list, base_url: str) -> str:
+    if not hooks_by_profile:
+        return ""
+
+    checkboxes_html = ""
+    for group in hooks_by_profile:
+        username = group["username"]
+        checkboxes_html += f'<div class="profile-group"><div class="profile-group-label">@{username}</div>'
+        for i, hook in enumerate(group["hooks"]):
+            hook_escaped = hook.replace('"', '&quot;').replace("'", "&#39;")
+            checkboxes_html += f'''<label class="hook-checkbox-item">
+                <input type="checkbox" class="hook-select" value="{hook_escaped}">
+                <span class="hook-checkbox-label">"{hook_escaped}"</span>
+            </label>'''
+        checkboxes_html += '</div>'
+
+    api_url = base_url + "/api/rewrite-hook"
+
+    return f"""
+<div class="rewriter-section">
+  <div class="rewriter-header">
+    <h2>✦ Hook Rewriter</h2>
+    <p>Select hooks from the analysis below, then click Rewrite. AI rewrites and humanises each one — only the final human-sounding version is shown.</p>
+  </div>
+  <div class="rewriter-body">
+    {checkboxes_html}
+    <p class="no-selection-msg" id="noSelMsg">Please select at least one hook to rewrite.</p>
+    <button class="rewrite-btn" id="rewriteBtn" onclick="rewriteHooks()">✦ Rewrite Selected Hooks</button>
+    <div class="rewrite-spinner" id="rewriteSpinner">⟳ &nbsp;AI is rewriting and humanising your hooks... this takes a few seconds</div>
+    <div class="results-area" id="resultsArea"></div>
+  </div>
+</div>
+
+<script>
+async function rewriteHooks() {{
+  const checked = Array.from(document.querySelectorAll('.hook-select:checked')).map(el => el.value);
+  const noSel = document.getElementById('noSelMsg');
+  if (checked.length === 0) {{
+    noSel.style.display = 'block';
+    return;
+  }}
+  noSel.style.display = 'none';
+
+  const btn = document.getElementById('rewriteBtn');
+  const spinner = document.getElementById('rewriteSpinner');
+  const area = document.getElementById('resultsArea');
+
+  btn.disabled = true;
+  spinner.style.display = 'block';
+  area.style.display = 'none';
+  area.innerHTML = '';
+
+  try {{
+    const res = await fetch('{api_url}', {{
+      method: 'POST',
+      headers: {{ 'Content-Type': 'application/json' }},
+      body: JSON.stringify({{ hooks: checked }})
+    }});
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    let html = '';
+    (data.results || []).forEach(r => {{
+      html += '<div class="result-card">'
+             + '<div class="result-original">Original: <span>' + escHtml(r.original) + '</span></div>'
+             + '<div class="result-label">✦ Rewritten &amp; Humanised</div>'
+             + '<div class="result-text" id="rt-' + Math.random().toString(36).slice(2) + '">' + escHtml(r.rewritten) + '</div>'
+             + '<button class="copy-result-btn" onclick="copyText(this, \'' + escAttr(r.rewritten) + '\')">Copy</button>'
+             + '</div>';
+    }});
+
+    area.innerHTML = html;
+    area.style.display = 'block';
+  }} catch(err) {{
+    area.innerHTML = '<div style="color:#ef4444;font-size:0.875rem;padding:12px">Error: ' + escHtml(err.message) + '. Make sure you are online and the app is running.</div>';
+    area.style.display = 'block';
+  }} finally {{
+    btn.disabled = false;
+    spinner.style.display = 'none';
+  }}
+}}
+
+function copyText(btn, text) {{
+  navigator.clipboard.writeText(text).then(() => {{
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  }});
+}}
+
+function escHtml(str) {{
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}}
+
+function escAttr(str) {{
+  return String(str).replace(/\\\\/g,'\\\\\\\\').replace(/'/g,"\\\\'");
+}}
+</script>"""
 
 
 def format_number(n: int) -> str:
