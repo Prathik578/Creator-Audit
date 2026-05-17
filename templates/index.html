@@ -623,6 +623,10 @@ function renderResults(profiles, errors) {
   });
 
   container.innerHTML = html;
+
+  profiles.forEach(p => {
+    populateAiText(p);
+  });
 }
 
 function buildProfileCard(p) {
@@ -714,50 +718,71 @@ function buildProfileCard(p) {
   </div>`;
 }
 
+const dmStore = {};
+
 function buildAiSection(p) {
   const ai = p.ai_insights || {};
   const summary = ai.audit_summary || '';
   const ideas = ai.content_ideas || [];
   const dm = ai.dm_message || '';
+  const username = p.username || 'unknown';
 
   let html = '';
 
   if (summary) {
-    html += `
-      <div class="ai-section">
-        <div class="ai-section-label">
-          <span class="ai-chip">✦ Gemini AI Audit</span>
-        </div>
-        <p class="ai-summary">${summary}</p>
-      </div>`;
+    html += '<div class="ai-section"><div class="ai-section-label"><span class="ai-chip">✦ Gemini AI Audit</span></div>'
+          + '<p class="ai-summary ai-text" data-key="sum-' + username + '"></p></div>';
   }
 
   if (ideas.length) {
-    const ideasHtml = ideas.map(idea => `<div class="idea-item"><span class="idea-icon">✦</span>${idea}</div>`).join('');
-    html += `
-      <div class="section-title">AI Content Ideas for Their Niche</div>
-      <div class="ideas-list">${ideasHtml}</div>`;
+    let ideasInner = '';
+    ideas.forEach((_, i) => {
+      ideasInner += '<div class="idea-item"><span class="idea-icon">✦</span>'
+                  + '<span class="ai-text" data-key="idea-' + username + '-' + i + '"></span></div>';
+    });
+    html += '<div class="section-title">AI Content Ideas for Their Niche</div>'
+          + '<div class="ideas-list">' + ideasInner + '</div>';
   }
 
   if (dm) {
-    html += `
-      <div class="pitch-box ai-dm-box">
-        <div class="pitch-box-title">✦ AI-Written Outreach DM</div>
-        <div class="pitch-message">${dm}</div>
-        <button class="copy-btn" onclick="copyDM(this, \`${dm.replace(/`/g,'\\`')}\`)">Copy DM</button>
-      </div>`;
+    dmStore[username] = dm;
+    html += '<div class="pitch-box ai-dm-box">'
+          + '<div class="pitch-box-title">✦ AI-Written Outreach DM</div>'
+          + '<div class="pitch-message ai-text" data-key="dm-' + username + '"></div>'
+          + '<button class="copy-btn" data-username="' + username + '" onclick="copyDM(this)">Copy DM</button>'
+          + '</div>';
   } else {
-    html += `
-      <div class="pitch-box">
-        <div class="pitch-box-title">📨 Suggested DM Outreach</div>
-        <div class="pitch-message">"Hey ${p.full_name || '@' + (p.username || '')}! Love what you're creating. I noticed your hooks could be pulling in a lot more views. I help creators like you write scroll-stopping scripts and content ideas that actually convert. Want a free sample script?"</div>
-      </div>`;
+    const name = p.full_name || ('@' + username);
+    html += '<div class="pitch-box"><div class="pitch-box-title">📨 Suggested DM Outreach</div>'
+          + '<div class="pitch-message ai-text" data-key="fallback-' + username + '"></div></div>';
+    dmStore['fallback-' + username] = 'Hey ' + name + '! Love what you\'re creating. I noticed your hooks could be pulling in a lot more views. I help creators like you write scroll-stopping scripts and content ideas that actually convert. Want a free sample script?';
   }
 
   return html;
 }
 
-function copyDM(btn, text) {
+function populateAiText(p) {
+  const ai = p.ai_insights || {};
+  const username = p.username || 'unknown';
+
+  const sumEl = document.querySelector('[data-key="sum-' + username + '"]');
+  if (sumEl) sumEl.textContent = ai.audit_summary || '';
+
+  (ai.content_ideas || []).forEach((idea, i) => {
+    const el = document.querySelector('[data-key="idea-' + username + '-' + i + '"]');
+    if (el) el.textContent = idea;
+  });
+
+  const dmEl = document.querySelector('[data-key="dm-' + username + '"]');
+  if (dmEl) dmEl.textContent = ai.dm_message || '';
+
+  const fbEl = document.querySelector('[data-key="fallback-' + username + '"]');
+  if (fbEl) fbEl.textContent = dmStore['fallback-' + username] || '';
+}
+
+function copyDM(btn) {
+  const username = btn.getAttribute('data-username');
+  const text = dmStore[username] || '';
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = 'Copied!';
     setTimeout(() => { btn.textContent = 'Copy DM'; }, 2000);
