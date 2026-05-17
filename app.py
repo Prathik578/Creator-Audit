@@ -4,6 +4,7 @@ import json
 import io
 import os
 from datetime import datetime
+from urllib.parse import quote
 from analyzer import analyze_profile
 from report_generator import generate_report_html
 from ai_writer import generate_ai_insights
@@ -60,7 +61,7 @@ def scrape():
     for username in usernames:
         username = username.strip().lstrip("@")
         try:
-            status, profile_raw = rapidapi_get(f"/profile?username={username}")
+            status, profile_raw = rapidapi_get(f"/profile?username={quote(username)}")
 
             if status != 200 or not profile_raw.get("status", True) == True:
                 err_msg = profile_raw.get("errorMessage") or profile_raw.get("message") or "Failed to fetch profile"
