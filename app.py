@@ -59,7 +59,7 @@ def scrape():
     errors = []
 
     for username in usernames:
-        username = username.strip().lstrip("@")
+        username = username.strip().lstrip("@").replace(" ", "").replace("@", "")
         try:
             status, profile_raw = rapidapi_get(f"/profile?username={quote(username)}")
 
