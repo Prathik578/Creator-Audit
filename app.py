@@ -6,6 +6,7 @@ import os
 from datetime import datetime
 from analyzer import analyze_profile
 from report_generator import generate_report_html
+from ai_writer import generate_ai_insights
 
 app = Flask(__name__)
 
@@ -113,6 +114,8 @@ def scrape():
 
             analysis = analyze_profile(profile_data)
             profile_data["analysis"] = analysis
+            ai_insights = generate_ai_insights(profile_data, analysis)
+            profile_data["ai_insights"] = ai_insights
             results.append(profile_data)
 
         except json.JSONDecodeError:

@@ -444,6 +444,64 @@
     color: #a78bfa;
     margin-left: 8px;
   }
+
+  .ai-section {
+    background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(99,102,241,0.07));
+    border: 1px solid rgba(124,58,237,0.25);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 20px;
+  }
+  .ai-section-label { margin-bottom: 10px; }
+  .ai-chip {
+    display: inline-block;
+    background: linear-gradient(135deg, #7c3aed, #6366f1);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .ai-summary {
+    font-size: 0.9rem;
+    color: #c4b5fd;
+    line-height: 1.7;
+    font-style: italic;
+  }
+
+  .ideas-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+  .idea-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: rgba(124,58,237,0.08);
+    border: 1px solid rgba(124,58,237,0.2);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.875rem;
+    color: #c4b5fd;
+    line-height: 1.5;
+  }
+  .idea-icon { color: #a78bfa; flex-shrink: 0; font-size: 0.8rem; margin-top: 2px; }
+
+  .ai-dm-box { position: relative; }
+  .copy-btn {
+    margin-top: 14px;
+    display: inline-block;
+    padding: 7px 16px;
+    background: rgba(124,58,237,0.25);
+    border: 1px solid rgba(124,58,237,0.5);
+    color: #c4b5fd;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s;
+  }
+  .copy-btn:hover { background: rgba(124,58,237,0.4); }
 </style>
 </head>
 <body>
@@ -651,12 +709,59 @@ function buildProfileCard(p) {
       <div class="section-title">Your Sales Talking Points</div>
       <div class="recs-list">${recsHtml}</div>
 
-      <div class="pitch-box">
-        <div class="pitch-box-title">📨 Suggested DM Outreach</div>
-        <div class="pitch-message">"Hey ${p.full_name || '@' + (p.username || '')}! Love what you're creating — I've been following your content. I noticed your hooks could be pulling in a lot more views. I help creators like you write scroll-stopping scripts and content ideas that actually convert. Would you be open to a free sample script for one of your upcoming posts? No strings attached."</div>
-      </div>
+      ${buildAiSection(p)}
     </div>
   </div>`;
+}
+
+function buildAiSection(p) {
+  const ai = p.ai_insights || {};
+  const summary = ai.audit_summary || '';
+  const ideas = ai.content_ideas || [];
+  const dm = ai.dm_message || '';
+
+  let html = '';
+
+  if (summary) {
+    html += `
+      <div class="ai-section">
+        <div class="ai-section-label">
+          <span class="ai-chip">✦ Gemini AI Audit</span>
+        </div>
+        <p class="ai-summary">${summary}</p>
+      </div>`;
+  }
+
+  if (ideas.length) {
+    const ideasHtml = ideas.map(idea => `<div class="idea-item"><span class="idea-icon">✦</span>${idea}</div>`).join('');
+    html += `
+      <div class="section-title">AI Content Ideas for Their Niche</div>
+      <div class="ideas-list">${ideasHtml}</div>`;
+  }
+
+  if (dm) {
+    html += `
+      <div class="pitch-box ai-dm-box">
+        <div class="pitch-box-title">✦ AI-Written Outreach DM</div>
+        <div class="pitch-message">${dm}</div>
+        <button class="copy-btn" onclick="copyDM(this, \`${dm.replace(/`/g,'\\`')}\`)">Copy DM</button>
+      </div>`;
+  } else {
+    html += `
+      <div class="pitch-box">
+        <div class="pitch-box-title">📨 Suggested DM Outreach</div>
+        <div class="pitch-message">"Hey ${p.full_name || '@' + (p.username || '')}! Love what you're creating. I noticed your hooks could be pulling in a lot more views. I help creators like you write scroll-stopping scripts and content ideas that actually convert. Want a free sample script?"</div>
+      </div>`;
+  }
+
+  return html;
+}
+
+function copyDM(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy DM'; }, 2000);
+  });
 }
 
 async function exportReport() {

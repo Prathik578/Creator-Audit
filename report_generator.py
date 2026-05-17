@@ -7,8 +7,9 @@ def generate_report_html(profiles: list) -> str:
 
     for p in profiles:
         analysis = p.get("analysis", {})
+        ai = p.get("ai_insights", {})
+
         issues_html = "".join(f'<li>{i}</li>' for i in analysis.get("top_issues", []))
-        recs_html = "".join(f'<li>{r}</li>' for r in analysis.get("recommendations", []))
         hooks_html = ""
         for hb in analysis.get("hook_breakdown", [])[:4]:
             score = hb.get("score", 0)
@@ -17,24 +18,27 @@ def generate_report_html(profiles: list) -> str:
             <div class="hook-item">
                 <div class="hook-text">"{hb.get('hook', 'N/A')}"</div>
                 <div class="hook-score" style="color:{color}">Score: {score}/100</div>
-                {'<div class="hook-issue">' + hb['issues'][0] + '</div>' if hb.get('issues') else ''}
+                {'<div class="hook-issue">' + hb["issues"][0] + '</div>' if hb.get("issues") else ''}
             </div>"""
+
+        ideas_html = ""
+        for idea in ai.get("content_ideas", []):
+            ideas_html += f'<li>{idea}</li>'
 
         opp_score = analysis.get("opportunity_score", 0)
         opp_label = analysis.get("opportunity_label", "Unknown")
         if opp_score >= 75:
-            opp_color = "#ef4444"
-            opp_bg = "#fef2f2"
+            opp_color = "#ef4444"; opp_bg = "#fef2f2"
         elif opp_score >= 50:
-            opp_color = "#f59e0b"
-            opp_bg = "#fffbeb"
+            opp_color = "#f59e0b"; opp_bg = "#fffbeb"
         else:
-            opp_color = "#22c55e"
-            opp_bg = "#f0fdf4"
+            opp_color = "#22c55e"; opp_bg = "#f0fdf4"
 
         engagement = analysis.get("engagement_rate", 0)
         hook_score = analysis.get("hook_score", 0)
         hook_quality = analysis.get("hook_quality", "N/A")
+        audit_summary = ai.get("audit_summary", "")
+        dm_message = ai.get("dm_message", "")
 
         cards_html += f"""
         <div class="profile-card">
@@ -71,6 +75,11 @@ def generate_report_html(profiles: list) -> str:
                 </div>
             </div>
 
+            {f'''<div class="ai-summary-section">
+                <div class="ai-badge">✦ AI Audit</div>
+                <p class="ai-summary-text">{audit_summary}</p>
+            </div>''' if audit_summary else ''}
+
             <div class="section">
                 <h3>Key Issues Identified</h3>
                 <ul class="issues-list">{issues_html}</ul>
@@ -81,18 +90,14 @@ def generate_report_html(profiles: list) -> str:
                 <div class="hooks-container">{hooks_html}</div>
             </div>
 
-            <div class="section pitch-section">
-                <h3>Your Pitch Talking Points</h3>
-                <ul class="recs-list">{recs_html}</ul>
-            </div>
+            {f'''<div class="section">
+                <h3>✦ AI-Generated Content Ideas for Their Niche</h3>
+                <ul class="ideas-list">{ideas_html}</ul>
+            </div>''' if ideas_html else ''}
 
             <div class="pitch-box">
-                <h3>Suggested Outreach Message</h3>
-                <p class="pitch-text">
-                    "Hey {p.get('full_name', '@' + p.get('username', ''))}! I've been looking at your content and I love what you're building.
-                    I noticed your engagement could be pushed higher — specifically your hooks aren't grabbing attention as fast as they could.
-                    I help creators like you with scroll-stopping hooks and viral content ideas. Would you be open to seeing a free sample script for one of your upcoming posts?"
-                </p>
+                <h3>✦ AI-Written Outreach DM</h3>
+                <p class="pitch-text">{dm_message or 'No message generated.'}</p>
             </div>
         </div>"""
 
@@ -125,39 +130,41 @@ def generate_report_html(profiles: list) -> str:
   .stat {{ text-align: center; }}
   .stat-value {{ font-size: 1.4rem; font-weight: 700; color: #1e293b; }}
   .stat-label {{ font-size: 0.75rem; color: #94a3b8; margin-top: 4px; font-weight: 500; }}
+  .ai-summary-section {{ padding: 20px 32px; background: linear-gradient(135deg, #faf5ff, #f5f3ff); border-bottom: 1px solid #e9d5ff; }}
+  .ai-badge {{ display: inline-block; background: linear-gradient(135deg, #7c3aed, #6366f1); color: white; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }}
+  .ai-summary-text {{ font-size: 0.95rem; color: #4c1d95; line-height: 1.7; font-style: italic; }}
   .section {{ padding: 24px 32px; border-bottom: 1px solid #f1f5f9; }}
   .section h3 {{ font-size: 0.95rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }}
   .issues-list {{ list-style: none; display: flex; flex-direction: column; gap: 10px; }}
   .issues-list li {{ padding: 10px 14px; background: #fff7ed; border-left: 3px solid #f97316; border-radius: 6px; font-size: 0.9rem; color: #431407; }}
-  .recs-list {{ list-style: none; display: flex; flex-direction: column; gap: 10px; }}
-  .recs-list li {{ padding: 10px 14px; background: #f0fdf4; border-left: 3px solid #22c55e; border-radius: 6px; font-size: 0.9rem; color: #14532d; }}
+  .ideas-list {{ list-style: none; display: flex; flex-direction: column; gap: 10px; }}
+  .ideas-list li {{ padding: 10px 14px; background: #f5f3ff; border-left: 3px solid #8b5cf6; border-radius: 6px; font-size: 0.9rem; color: #2e1065; }}
   .hooks-container {{ display: flex; flex-direction: column; gap: 12px; }}
   .hook-item {{ background: #f8fafc; border-radius: 8px; padding: 14px; border: 1px solid #e2e8f0; }}
   .hook-text {{ font-size: 0.9rem; color: #334155; font-style: italic; margin-bottom: 6px; }}
   .hook-score {{ font-size: 0.8rem; font-weight: 700; }}
   .hook-issue {{ font-size: 0.78rem; color: #ef4444; margin-top: 4px; }}
-  .pitch-section {{ background: #fafafa; }}
   .pitch-box {{ padding: 28px 32px; background: linear-gradient(135deg, #ede9fe, #ddd6fe); }}
   .pitch-box h3 {{ font-size: 0.95rem; font-weight: 700; color: #5b21b6; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }}
-  .pitch-text {{ font-size: 0.92rem; color: #4c1d95; line-height: 1.7; font-style: italic; }}
+  .pitch-text {{ font-size: 0.92rem; color: #4c1d95; line-height: 1.7; }}
   .report-footer {{ text-align: center; padding: 40px 20px; color: #94a3b8; font-size: 0.85rem; }}
 </style>
 </head>
 <body>
 <div class="report-header">
   <h1>Instagram Creator Audit Report</h1>
-  <p>Identify low-performing creators and turn their weaknesses into your sales pitch</p>
+  <p>AI-powered creator analysis — identify leads and pitch your script writing services</p>
   <div class="report-meta">
     <div class="meta-item">Generated: {date_str}</div>
     <div class="meta-item">Profiles Analyzed: {len(profiles)}</div>
-    <div class="meta-item">Service: Script Writing & Idea Generation</div>
+    <div class="meta-item">Powered by Google Gemini AI</div>
   </div>
 </div>
 <div class="container">
   {cards_html}
 </div>
 <div class="report-footer">
-  <p>Generated by CreatorAudit — Instagram Performance Intelligence Tool</p>
+  <p>Generated by CreatorAudit — AI-Powered Instagram Lead Intelligence</p>
 </div>
 </body>
 </html>"""
