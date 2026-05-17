@@ -1,19 +1,18 @@
 import os
-import google.generativeai as genai
+from google import genai
 
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 
 
-def _get_model():
+def _get_client():
     if not GOOGLE_API_KEY:
         return None
-    genai.configure(api_key=GOOGLE_API_KEY)
-    return genai.GenerativeModel("gemini-1.5-flash")
+    return genai.Client(api_key=GOOGLE_API_KEY)
 
 
 def generate_ai_insights(profile: dict, analysis: dict) -> dict:
-    model = _get_model()
-    if not model:
+    client = _get_client()
+    if not client:
         return _fallback_insights(profile, analysis)
 
     username = profile.get("username", "")
@@ -58,20 +57,17 @@ Give 3 specific viral content ideas tailored to their niche that would dramatica
 Write a short, natural DM message (3-5 sentences) I can send to this creator to pitch my script writing service. Sound like a real person, not a bot. Reference something specific about their content or bio. End with a low-pressure CTA offering a free sample script."""
 
     try:
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model="gemini-1.5-flash",
+            contents=prompt,
+        )
         text = response.text
         return _parse_response(text, full_name, username)
-    except Exception as e:
+    except Exception:
         return _fallback_insights(profile, analysis)
 
 
 def _parse_response(text: str, full_name: str, username: str) -> dict:
-    sections = {
-        "audit_summary": "",
-        "content_ideas": [],
-        "dm_message": "",
-    }
-
     def extract_section(marker_start, marker_end=None):
         start = text.find(marker_start)
         if start == -1:
@@ -86,8 +82,6 @@ def _parse_response(text: str, full_name: str, username: str) -> dict:
     ideas_raw = extract_section("---CONTENT_IDEAS---", "---DM_MESSAGE---")
     dm = extract_section("---DM_MESSAGE---")
 
-    sections["audit_summary"] = summary
-
     ideas = []
     for line in ideas_raw.split("\n"):
         line = line.strip()
@@ -95,11 +89,12 @@ def _parse_response(text: str, full_name: str, username: str) -> dict:
             cleaned = line.lstrip("0123456789.-) ").strip()
             if cleaned:
                 ideas.append(cleaned)
-    sections["content_ideas"] = ideas[:3]
 
-    sections["dm_message"] = dm
-
-    return sections
+    return {
+        "audit_summary": summary,
+        "content_ideas": ideas[:3],
+        "dm_message": dm,
+    }
 
 
 def _fallback_insights(profile: dict, analysis: dict) -> dict:
@@ -117,7 +112,7 @@ def _fallback_insights(profile: dict, analysis: dict) -> dict:
         "content_ideas": [
             "3 mistakes most creators in your niche are making (and how to avoid them)",
             "A day-in-the-life format showing behind-the-scenes of your process",
-            "Controversial take on a common belief in your niche — start with 'Unpopular opinion:'"
+            "Controversial take on a common belief in your niche — start with 'Unpopular opinion:'",
         ],
         "dm_message": (
             f"Hey {full_name}! I've been following your content and love what you're building. "
