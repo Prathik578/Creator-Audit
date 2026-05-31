@@ -100,6 +100,36 @@ Preference: [One sentence on what content format this audience responds best to]
 ---CONFIDENCE---
 [High if 6+ posts analyzed and bio is clear. Medium if limited data. Low if almost no data.]
 
+---EXECUTIVE_SUMMARY---
+Position: [One precise sentence on where this creator stands today — be specific with numbers]
+Blocker: [The single biggest specific thing preventing growth — data-referenced, blunt]
+Opportunity: [The single highest-leverage action available right now — specific and actionable]
+Direction: [One strategic sentence on their optimal path forward over the next 90 days]
+
+---QUICK_WINS---
+- [Action they can do TODAY with immediate impact — hyper-specific]
+- [Second quick win — doable this week]
+- [Third quick win — low effort, high reward]
+
+---PRIORITY_FIXES---
+- [Most impactful problem to fix first — specific, data-referenced]
+- [Second priority fix — ranked by growth impact]
+- [Third priority fix]
+
+---LONG_TERM_OPPORTUNITIES---
+- [Strategic play for 3-6 months that could 2-5x their growth — niche-specific]
+- [Second long-term strategic opportunity]
+- [Third long-term opportunity]
+
+---WEEKLY_CHECKLIST---
+- [Weekly habit #1 for consistent algorithmic growth]
+- [Weekly habit #2]
+- [Weekly habit #3]
+- [Weekly habit #4]
+- [Weekly habit #5]
+- [Weekly habit #6]
+- [Weekly habit #7]
+
 ---AUDIT_SUMMARY---
 [2-3 blunt, specific sentences summarizing why this creator underperforms and the core fix. Reference their niche and numbers.]
 
@@ -194,12 +224,34 @@ def _parse_structured_response(text: str, full_name: str, username: str, analysi
         elif 'Preference:' in line:
             audience["preference"] = line.split('Preference:', 1)[1].strip()
 
-    confidence_raw = extract("---CONFIDENCE---", "---AUDIT_SUMMARY---").strip()
+    confidence_raw = extract("---CONFIDENCE---", "---EXECUTIVE_SUMMARY---").strip()
     confidence = "Medium"
     if "High" in confidence_raw:
         confidence = "High"
     elif "Low" in confidence_raw:
         confidence = "Low"
+
+    exec_raw = extract("---EXECUTIVE_SUMMARY---", "---QUICK_WINS---")
+    exec_summary = {"position": "", "blocker": "", "opportunity": "", "direction": ""}
+    for line in exec_raw.split('\n'):
+        line = line.strip()
+        for field in ["Position", "Blocker", "Opportunity", "Direction"]:
+            if line.startswith(field + ":"):
+                exec_summary[field.lower()] = line.split(":", 1)[1].strip()
+
+    quick_wins = extract_bullets(extract("---QUICK_WINS---", "---PRIORITY_FIXES---"))
+    priority_fixes = extract_bullets(extract("---PRIORITY_FIXES---", "---LONG_TERM_OPPORTUNITIES---"))
+    long_term = extract_bullets(extract("---LONG_TERM_OPPORTUNITIES---", "---WEEKLY_CHECKLIST---"))
+
+    checklist_raw = extract("---WEEKLY_CHECKLIST---", "---AUDIT_SUMMARY---")
+    weekly_checklist = []
+    for line in checklist_raw.split('\n'):
+        line = line.strip()
+        if line.startswith('-') or line.startswith('•'):
+            cleaned = line.lstrip('-•').strip()
+            if cleaned:
+                weekly_checklist.append(cleaned)
+    weekly_checklist = weekly_checklist[:7]
 
     summary = extract("---AUDIT_SUMMARY---", "---DM_MESSAGE---")
     dm = extract("---DM_MESSAGE---")
@@ -227,6 +279,11 @@ def _parse_structured_response(text: str, full_name: str, username: str, analysi
         "content_ideas": ideas,
         "audience_analysis": audience,
         "confidence_level": confidence,
+        "executive_summary": exec_summary,
+        "quick_wins": quick_wins,
+        "priority_fixes": priority_fixes,
+        "long_term_opportunities": long_term,
+        "weekly_checklist": weekly_checklist,
         "audit_summary": summary,
         "dm_message": dm,
     }
@@ -335,6 +392,36 @@ def _fallback_insights(profile: dict, analysis: dict) -> dict:
             "preference": "Likely responds better to educational, story-driven content over promotional or generic posts"
         },
         "confidence_level": "Medium",
+        "executive_summary": {
+            "position": f"@{username} has {profile.get('followers', 0):,} followers but is significantly underperforming with a {engagement}% engagement rate",
+            "blocker": f"Weak hook quality ({hook_quality.lower()} score) means most posts are getting scrolled past before the content can land",
+            "opportunity": "Rewriting the first line of every post with a curiosity gap or bold claim is the single highest-leverage fix available right now",
+            "direction": "Prioritize hook quality and posting consistency for the next 30 days before expanding into new content formats"
+        },
+        "quick_wins": [
+            "Rewrite the hooks on your 3 most recent posts and update the captions today",
+            "Add a bold question or stat to your next post's opening line before you publish it",
+            "Reply to every comment on your last 5 posts to signal engagement to the algorithm"
+        ],
+        "priority_fixes": [
+            f"Fix hook quality immediately — {hook_quality.lower()} hooks are costing you reach on every single post",
+            f"Boost engagement rate from {engagement}% toward the 3%+ benchmark through content format changes",
+            "Establish a consistent posting rhythm — irregular posting actively suppresses algorithmic reach"
+        ],
+        "long_term_opportunities": [
+            "Build a signature content series that runs weekly — creates appointment viewing and loyalty",
+            "Develop a lead magnet in your bio that converts followers to an owned email or DM list",
+            "Collaborate with 3-5 complementary creators in your niche to cross-pollinate audiences"
+        ],
+        "weekly_checklist": [
+            "Post 3-5 times with scroll-stopping hooks on every caption",
+            "Spend 20 minutes engaging in your niche's comment sections",
+            "Review last week's analytics and identify your highest-performing post format",
+            "Create 3 pieces of content in advance to maintain consistency",
+            "Check and respond to every DM and comment within 24 hours",
+            "Research one trending topic or format in your niche this week",
+            "Update your content bank with 5 new ideas based on what's performing in your niche"
+        ],
         "audit_summary": (
             f"@{username}'s content is leaving significant reach on the table. "
             f"With a {engagement}% engagement rate and {hook_quality.lower()} hooks, "

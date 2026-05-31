@@ -2,6 +2,79 @@ from datetime import datetime
 import json
 
 
+def _esc(s):
+    return str(s or '').replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace('"','&quot;')
+
+
+def _exec_summary_html(exec_summary: dict) -> str:
+    if not exec_summary or not exec_summary.get("position"):
+        return ""
+    pos = _esc(exec_summary.get("position",""))
+    blk = _esc(exec_summary.get("blocker",""))
+    opp = _esc(exec_summary.get("opportunity",""))
+    dire = _esc(exec_summary.get("direction",""))
+    return f"""<div style="padding:24px 32px;border-bottom:1px solid #f1f5f9;background:linear-gradient(135deg,#faf5ff,#f5f3ff)">
+      <div style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#6366f1);color:white;font-size:0.68rem;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px">✦ Executive Summary</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:white;border:1px solid #e2e8f0;border-radius:10px;padding:14px">
+          <div style="font-size:0.66rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Current Position</div>
+          <div style="font-size:0.84rem;color:#1e293b;line-height:1.5">{pos}</div>
+        </div>
+        <div style="background:white;border:1px solid #fecaca;border-radius:10px;padding:14px">
+          <div style="font-size:0.66rem;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">⚡ Growth Blocker</div>
+          <div style="font-size:0.84rem;color:#1e293b;line-height:1.5">{blk}</div>
+        </div>
+        <div style="background:white;border:1px solid #bbf7d0;border-radius:10px;padding:14px">
+          <div style="font-size:0.66rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">✦ Top Opportunity</div>
+          <div style="font-size:0.84rem;color:#1e293b;line-height:1.5">{opp}</div>
+        </div>
+        <div style="background:white;border:1px solid #ede9fe;border-radius:10px;padding:14px">
+          <div style="font-size:0.66rem;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">→ Strategic Direction</div>
+          <div style="font-size:0.84rem;color:#1e293b;line-height:1.5">{dire}</div>
+        </div>
+      </div>
+    </div>"""
+
+
+def _qw_pf_html(quick_wins: list, priority_fixes: list) -> str:
+    if not quick_wins and not priority_fixes:
+        return ""
+    qw_items = ''.join(f'<li style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:0.84rem;color:#166534;line-height:1.5"><span style="color:#22c55e;flex-shrink:0;margin-top:1px">✓</span>{_esc(w)}</li>' for w in quick_wins)
+    pf_items = ''.join(f'<li style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:0.84rem;color:#991b1b;line-height:1.5"><span style="color:#ef4444;flex-shrink:0;margin-top:1px">✕</span>{_esc(f)}</li>' for f in priority_fixes)
+    return f"""<div style="padding:24px 32px;border-bottom:1px solid #f1f5f9">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px">
+          <div style="font-size:0.7rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">⚡ Quick Wins</div>
+          <ul style="list-style:none">{qw_items}</ul>
+        </div>
+        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:16px">
+          <div style="font-size:0.7rem;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">🔴 Priority Fixes</div>
+          <ul style="list-style:none">{pf_items}</ul>
+        </div>
+      </div>
+    </div>"""
+
+
+def _lt_html(long_term: list) -> str:
+    if not long_term:
+        return ""
+    cards = ''.join(f'<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px"><div style="font-size:1.4rem;font-weight:800;color:#c4b5fd;line-height:1;margin-bottom:8px">0{i+1}</div><div style="font-size:0.84rem;color:#1e293b;line-height:1.55">{_esc(lt)}</div></div>' for i, lt in enumerate(long_term))
+    return f"""<div style="padding:24px 32px;border-bottom:1px solid #f1f5f9">
+      <div class="section-title">Long-Term Growth Opportunities</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">{cards}</div>
+    </div>"""
+
+
+def _checklist_html(items: list) -> str:
+    if not items:
+        return ""
+    rows = ''.join(f'<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:6px"><div style="width:16px;height:16px;border:2px solid #7c3aed;border-radius:4px;flex-shrink:0;margin-top:1px"></div><div style="font-size:0.84rem;color:#334155;line-height:1.45">{_esc(item)}</div></div>' for item in items)
+    return f"""<div style="padding:24px 32px;border-bottom:1px solid #f1f5f9">
+      <div class="section-title">Weekly Growth Checklist</div>
+      {rows}
+    </div>"""
+
+
 def generate_report_html(profiles: list, base_url: str = "") -> str:
     date_str = datetime.now().strftime("%B %d, %Y")
     cards_html = ""
@@ -139,6 +212,8 @@ def generate_report_html(profiles: list, base_url: str = "") -> str:
             </div>
           </div>
 
+          {_exec_summary_html(ai.get("executive_summary", {}))}
+
           <div style="padding:24px 32px;border-bottom:1px solid #f1f5f9">
             <div class="section-title">✦ AI Audit Summary</div>
             <div style="background:linear-gradient(135deg,#faf5ff,#f5f3ff);border:1px solid #e9d5ff;border-radius:12px;padding:18px">
@@ -146,6 +221,8 @@ def generate_report_html(profiles: list, base_url: str = "") -> str:
               <p style="font-size:0.9rem;color:#4c1d95;line-height:1.75;font-style:italic">{_esc(audit_summary)}</p>
             </div>
           </div>
+
+          {_qw_pf_html(ai.get("quick_wins", []), ai.get("priority_fixes", []))}
 
           {'<div style="padding:24px 32px;border-bottom:1px solid #f1f5f9"><div class="section-title">Strengths · Weaknesses · Opportunities</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">' +
             f'<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px"><div style="font-size:0.72rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">✓ Strengths</div><ul style="list-style:none">{strengths_html}</ul></div>' +
@@ -158,6 +235,10 @@ def generate_report_html(profiles: list, base_url: str = "") -> str:
           {f'<div style="padding:24px 32px;border-bottom:1px solid #f1f5f9"><div class="section-title">7-Day Action Plan</div>{action_plan_html}</div>' if action_plan_html else ''}
 
           {f'<div style="padding:24px 32px;border-bottom:1px solid #f1f5f9"><div class="section-title">AI Content Ideas</div>{ideas_html}</div>' if ideas_html else ''}
+
+          {_lt_html(ai.get("long_term_opportunities", []))}
+
+          {_checklist_html(ai.get("weekly_checklist", []))}
 
           {f'''<div style="padding:24px 32px;border-bottom:1px solid #f1f5f9"><div class="section-title">Audience Analysis</div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
@@ -356,8 +437,6 @@ function escHtml(str) {{
 </script>"""
 
 
-def _esc(s: str) -> str:
-    return str(s or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
 
 
 def format_number(n: int) -> str:
