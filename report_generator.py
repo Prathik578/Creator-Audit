@@ -191,12 +191,15 @@ def generate_report_html(profiles: list, base_url: str = "") -> str:
           </div>
 
           <div style="padding:24px 32px;border-bottom:1px solid #f1f5f9">
-            <div style="display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:center">
-              <div style="text-align:center">
+            <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+              <div style="text-align:center;flex-shrink:0">
                 {_svg_circle(overall, overall_color, 42, 110)}
                 <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b;margin-top:6px">Overall Score</div>
               </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div style="display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                {_radar_chart_svg(branding, eng_sc, consist, growth, 180)}
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;min-width:220px">
                 {_score_bar_html("Branding", branding)}
                 {_score_bar_html("Engagement", eng_sc)}
                 {_score_bar_html("Consistency", consist)}
@@ -352,6 +355,51 @@ def _score_bar_html(label: str, score: int) -> str:
             f'<div style="background:#e2e8f0;border-radius:100px;height:5px">'
             f'<div style="height:5px;border-radius:100px;background:{color};width:{score}%"></div>'
             f'</div></div>')
+
+
+def _radar_chart_svg(branding: int, engagement: int, consistency: int, growth: int, size: int = 180) -> str:
+    import math
+    cx = cy = size // 2
+    r = int(size * 0.33)
+    scores = [branding / 100, engagement / 100, consistency / 100, growth / 100]
+    labels = ["Branding", "Engagement", "Consistency", "Growth"]
+    label_vals = [branding, engagement, consistency, growth]
+    axis_pts = [(cx, cy - r), (cx + r, cy), (cx, cy + r), (cx - r, cy)]
+    label_offsets = [(0, -14, "middle"), (16, 4, "start"), (0, 18, "middle"), (-16, 4, "end")]
+
+    grid = ""
+    for pct in [0.25, 0.5, 0.75, 1.0]:
+        pr = r * pct
+        pts = f"{cx},{cy-pr:.1f} {cx+pr:.1f},{cy} {cx},{cy+pr:.1f} {cx-pr:.1f},{cy}"
+        stroke = "#e2e8f0" if pct < 1 else "#d1d5db"
+        grid += f'<polygon points="{pts}" fill="none" stroke="{stroke}" stroke-width="1"/>'
+    for ax, ay in axis_pts:
+        grid += f'<line x1="{cx}" y1="{cy}" x2="{ax}" y2="{ay}" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,2"/>'
+
+    data_pts = []
+    for i, (ax, ay) in enumerate(axis_pts):
+        dx = cx + (ax - cx) * scores[i]
+        dy = cy + (ay - cy) * scores[i]
+        data_pts.append(f"{dx:.1f},{dy:.1f}")
+    polygon = f'<polygon points="{" ".join(data_pts)}" fill="rgba(124,58,237,0.12)" stroke="#7c3aed" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'
+
+    dots = ""
+    for i, (ax, ay) in enumerate(axis_pts):
+        dx = cx + (ax - cx) * scores[i]
+        dy = cy + (ay - cy) * scores[i]
+        dots += f'<circle cx="{dx:.1f}" cy="{dy:.1f}" r="3.5" fill="#7c3aed"/>'
+
+    label_svg = ""
+    for i, (ax, ay) in enumerate(axis_pts):
+        ox, oy, anchor = label_offsets[i]
+        lx, ly = ax + ox, ay + oy
+        label_svg += (f'<text x="{lx}" y="{ly}" text-anchor="{anchor}" font-size="9" fill="#64748b" '
+                      f'font-weight="600" font-family="Segoe UI,system-ui,sans-serif">{labels[i]}</text>'
+                      f'<text x="{lx}" y="{ly+11}" text-anchor="{anchor}" font-size="9" fill="#7c3aed" '
+                      f'font-weight="700" font-family="Segoe UI,system-ui,sans-serif">{label_vals[i]}</text>')
+
+    return (f'<svg viewBox="0 0 {size} {size}" width="{size}" height="{size}" style="flex-shrink:0">'
+            f'{grid}{polygon}{dots}{label_svg}</svg>')
 
 
 def _build_hook_rewriter(hooks_by_profile: list, base_url: str) -> str:

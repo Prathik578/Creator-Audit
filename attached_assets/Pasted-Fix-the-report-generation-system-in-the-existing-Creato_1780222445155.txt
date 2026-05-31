@@ -1,0 +1,209 @@
+Fix the report generation system in the existing Creator Audit application.
+
+IMPORTANT:
+The recent UI/feature upgrades broke or degraded the actual report generation experience.
+
+PRIMARY GOAL:
+Restore stable, clean, high-quality report generation while ALSO improving the visual quality and perceived value of the reports.
+
+DO NOT rebuild the application.
+DO NOT remove existing premium UI improvements.
+Keep the current upgraded SaaS-style direction.
+
+==================================================
+SECTION 1 — FIX REPORT GENERATION LOGIC
+=======================================
+
+The report generation flow is currently unstable or producing broken/inconsistent outputs.
+
+Fix the following:
+
+* Ensure report generation completes successfully every time
+* Prevent blank sections
+* Prevent malformed layouts
+* Prevent inconsistent formatting
+* Prevent giant AI text walls
+* Ensure all report sections render correctly
+* Ensure scores always display properly
+* Ensure loading state transitions cleanly into completed reports
+* Ensure generated content is readable and structured
+
+The report system should feel:
+
+* stable
+* predictable
+* polished
+* production-quality
+
+==================================================
+SECTION 2 — ENFORCE CLEAN STRUCTURED OUTPUTS
+============================================
+
+Every generated report MUST follow a strict structure.
+
+Required sections:
+
+1. Executive Summary
+2. Overall Creator Score
+3. Branding Score
+4. Engagement Score
+5. Content Consistency Score
+6. Growth Potential Score
+7. Key Strengths
+8. Critical Weaknesses
+9. Growth Opportunities
+10. Audience Analysis
+11. Content Strategy Recommendations
+12. Viral Content Ideas
+13. 7-Day Action Plan
+14. Benchmark Position
+15. Confidence Level
+
+IMPORTANT:
+Every section must ALWAYS render properly.
+
+Avoid:
+
+* duplicated sections
+* missing sections
+* giant paragraphs
+* inconsistent spacing
+* broken cards
+
+==================================================
+SECTION 3 — IMPROVE REPORT VISUAL QUALITY
+=========================================
+
+The report should visually feel like:
+
+* premium analytics software
+* creator consulting dashboard
+* investor-demo-ready SaaS
+
+Improve:
+
+* typography hierarchy
+* spacing consistency
+* card layouts
+* visual grouping
+* section separation
+* readability
+
+Add:
+
+* radial score charts
+* animated progress bars
+* analytics cards
+* dashboard-style metric blocks
+* cleaner visual hierarchy
+
+The report should feel:
+
+* visually structured
+* easier to scan
+* more professional
+* more data-driven
+
+==================================================
+SECTION 4 — FIX REPORT READABILITY
+==================================
+
+Reduce excessive AI-generated filler text.
+
+The report should prioritize:
+
+* concise insights
+* structured bullets
+* actionable recommendations
+* clean formatting
+
+Every section should feel:
+
+* consultant-style
+* concise
+* strategic
+* easy to understand
+
+Avoid:
+
+* repetitive wording
+* generic motivational text
+* long unstructured paragraphs
+
+==================================================
+SECTION 5 — UPGRADE HTML EXPORT QUALITY
+=======================================
+
+The downloadable HTML report currently lacks enough polish.
+
+Upgrade the export so it feels:
+
+* premium
+* presentation-quality
+* consultant-grade
+
+Requirements:
+
+* clean typography
+* proper spacing
+* charts/progress visuals
+* beautiful section layouts
+* responsive formatting
+* printable quality
+* professional visual design
+
+The exported report should feel valuable enough to:
+
+* share
+* present
+* send to clients
+
+==================================================
+SECTION 6 — ADD HIGH-END SaaS POLISH
+====================================
+
+Add:
+
+* smoother animations
+* cleaner loading transitions
+* better hover states
+* premium button interactions
+* elegant dashboard feel
+* improved empty states
+* subtle motion design
+
+The app should feel:
+
+* smooth
+* modern
+* high-quality
+* professionally designed
+
+==================================================
+SECTION 7 — FINAL PRODUCT DIRECTION
+===================================
+
+The final app should feel like:
+
+* a real creator intelligence platform
+* a creator analytics SaaS
+* a consulting-style growth platform
+
+NOT:
+
+* a broken AI wrapper
+* a generic text generator
+* a messy dashboard
+
+Focus heavily on:
+
+* stability
+* readability
+* polish
+* trust
+* perceived value
+* report quality
+* visual maturity
+
+IMPORTANT:
+Prioritize fixing report generation reliability FIRST before adding additional visual enhancements.

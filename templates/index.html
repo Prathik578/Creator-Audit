@@ -141,9 +141,10 @@
   .exec-direction .exec-card-label { color: #a78bfa; }
 
   /* SCORES */
-  .scores-section { padding: 24px 28px; border-bottom: 1px solid var(--border); }
-  .scores-layout { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
-  .sub-scores { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; flex: 1; min-width: 220px; }
+  .scores-section { padding: 22px 28px; border-bottom: 1px solid var(--border); }
+  .scores-layout { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+  .sub-scores { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; flex: 1; min-width: 200px; }
+  .radar-wrap { display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .sub-score-item { display: flex; align-items: center; gap: 10px; background: var(--surface2); border-radius: 10px; padding: 10px 12px; border: 1px solid var(--border); }
   .sub-score-meta { flex: 1; min-width: 0; }
   .sub-score-name { font-size: 0.68rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 5px; }
@@ -618,9 +619,10 @@ function buildProfileCard(p) {
 
     <div class="scores-section">
       <div class="scores-layout">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0">
           ${scoreCircle(overall, overallColor, username)}
         </div>
+        <div class="radar-wrap">${radarChart(branding, engScore, consist, growth)}</div>
         <div class="sub-scores">
           ${subScoreBar('Branding', branding, username)}
           ${subScoreBar('Engagement', engScore, username)}
@@ -815,6 +817,33 @@ function subScoreBar(label, score, username) {
     </div>
     <div class="sub-score-num" style="color:${color}">${score}</div>
   </div>`;
+}
+
+function radarChart(branding, engagement, consistency, growth) {
+  const cx = 80, cy = 80, r = 54;
+  const scores = [branding/100, engagement/100, consistency/100, growth/100];
+  const labels = ['Branding','Engagement','Consistency','Growth'];
+  const vals = [branding, engagement, consistency, growth];
+  const axPts = [[cx,cy-r],[cx+r,cy],[cx,cy+r],[cx-r,cy]];
+  const lblOff = [[0,-15,'middle'],[17,4,'start'],[0,18,'middle'],[-17,4,'end']];
+  let g = '';
+  for (const pct of [0.25,0.5,0.75,1.0]) {
+    const pr = r*pct;
+    g += `<polygon points="${cx},${cy-pr} ${cx+pr},${cy} ${cx},${cy+pr} ${cx-pr},${cy}" fill="none" stroke="${pct===1?'#3a3a4e':'#2a2a38'}" stroke-width="1"/>`;
+  }
+  for (const [ax,ay] of axPts) g += `<line x1="${cx}" y1="${cy}" x2="${ax}" y2="${ay}" stroke="#2a2a38" stroke-width="1" stroke-dasharray="3,2"/>`;
+  const dpts = axPts.map(([ax,ay],i)=>`${(cx+(ax-cx)*scores[i]).toFixed(1)},${(cy+(ay-cy)*scores[i]).toFixed(1)}`);
+  g += `<polygon points="${dpts.join(' ')}" fill="rgba(124,58,237,0.18)" stroke="#7c3aed" stroke-width="1.5" stroke-linejoin="round"/>`;
+  axPts.forEach(([ax,ay],i)=>{
+    const dx=(cx+(ax-cx)*scores[i]).toFixed(1), dy=(cy+(ay-cy)*scores[i]).toFixed(1);
+    g+=`<circle cx="${dx}" cy="${dy}" r="3" fill="#a78bfa"/>`;
+  });
+  axPts.forEach(([ax,ay],i)=>{
+    const [ox,oy,anc]=lblOff[i], lx=ax+ox, ly=ay+oy;
+    g+=`<text x="${lx}" y="${ly}" text-anchor="${anc}" font-size="8" fill="#94a3b8" font-weight="600" font-family="Inter,system-ui">${labels[i]}</text>`;
+    g+=`<text x="${lx}" y="${ly+10}" text-anchor="${anc}" font-size="9" fill="#a78bfa" font-weight="700" font-family="Inter,system-ui">${vals[i]}</text>`;
+  });
+  return `<svg viewBox="0 0 160 160" width="145" height="145">${g}</svg>`;
 }
 
 function getBenchmark(followers, engagement) {

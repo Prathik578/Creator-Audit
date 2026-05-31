@@ -239,9 +239,36 @@ def _parse_structured_response(text: str, full_name: str, username: str, analysi
             if line.startswith(field + ":"):
                 exec_summary[field.lower()] = line.split(":", 1)[1].strip()
 
-    quick_wins = extract_bullets(extract("---QUICK_WINS---", "---PRIORITY_FIXES---"))
-    priority_fixes = extract_bullets(extract("---PRIORITY_FIXES---", "---LONG_TERM_OPPORTUNITIES---"))
-    long_term = extract_bullets(extract("---LONG_TERM_OPPORTUNITIES---", "---WEEKLY_CHECKLIST---"))
+    if not exec_summary.get("position"):
+        eng = analysis.get("engagement_rate", 0)
+        issues = analysis.get("top_issues", [])
+        hook_q = analysis.get("hook_quality", "weak")
+        exec_summary = {
+            "position": f"@{username} generates {eng:.1f}% engagement — {'below' if eng < 3 else 'near'} the 3–5% benchmark for growing creators in their niche",
+            "blocker": issues[0] if issues else f"Hook quality is {hook_q.lower()} — most posts are failing to stop the scroll before the content can land",
+            "opportunity": "Improving hook quality and posting consistency are the two highest-leverage fixes available right now",
+            "direction": "Prioritize content quality and consistency over the next 30–60 days before expanding into new formats or platforms"
+        }
+
+    quick_wins_raw = extract_bullets(extract("---QUICK_WINS---", "---PRIORITY_FIXES---"))
+    priority_fixes_raw = extract_bullets(extract("---PRIORITY_FIXES---", "---LONG_TERM_OPPORTUNITIES---"))
+    long_term_raw = extract_bullets(extract("---LONG_TERM_OPPORTUNITIES---", "---WEEKLY_CHECKLIST---"))
+
+    quick_wins = quick_wins_raw if quick_wins_raw else [
+        "Rewrite the hooks on your 3 most recent posts today — no new content needed",
+        "Add a bold question or stat to your next post's opening line before publishing",
+        "Reply to every comment on your last 5 posts to boost algorithmic engagement signals"
+    ]
+    priority_fixes = priority_fixes_raw if priority_fixes_raw else [
+        f"Fix hook quality immediately — {analysis.get('hook_quality','weak').lower()} hooks are suppressing reach on every post",
+        f"Boost engagement from {analysis.get('engagement_rate',0):.1f}% toward 3%+ through storytelling-led captions",
+        "Establish a 3–5 post per week cadence — inconsistent posting actively kills algorithmic momentum"
+    ]
+    long_term = long_term_raw if long_term_raw else [
+        "Build a signature weekly content series that creates appointment viewing and audience loyalty",
+        "Develop a DM-based lead magnet that converts followers to an owned email or contact list",
+        "Collaborate with 3–5 complementary creators to cross-pollinate audiences and accelerate growth"
+    ]
 
     checklist_raw = extract("---WEEKLY_CHECKLIST---", "---AUDIT_SUMMARY---")
     weekly_checklist = []
@@ -252,6 +279,16 @@ def _parse_structured_response(text: str, full_name: str, username: str, analysi
             if cleaned:
                 weekly_checklist.append(cleaned)
     weekly_checklist = weekly_checklist[:7]
+    if not weekly_checklist:
+        weekly_checklist = [
+            "Post 3–5 times with a scroll-stopping hook leading every single caption",
+            "Spend 20 minutes engaging authentically in your niche's comment sections",
+            "Review last week's analytics and double down on your highest-performing format",
+            "Film or write 3 pieces of content in advance to protect your consistency",
+            "Check and respond to every DM and comment within 24 hours",
+            "Research one trending topic or format in your niche this week",
+            "Add 5 new content ideas to your bank based on what's resonating right now"
+        ]
 
     summary = extract("---AUDIT_SUMMARY---", "---DM_MESSAGE---")
     dm = extract("---DM_MESSAGE---")
