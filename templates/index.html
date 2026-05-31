@@ -23,485 +23,202 @@
     --amber: #f59e0b;
   }
 
-  body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
+  body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
   /* NAV */
-  nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 32px;
-    border-bottom: 1px solid var(--border);
-    background: rgba(15,15,19,0.9);
-    backdrop-filter: blur(12px);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .logo {
-    font-size: 1.2rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, #a78bfa, #7c3aed);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px; border-bottom: 1px solid var(--border); background: rgba(15,15,19,0.9); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; }
+  .logo { font-size: 1.2rem; font-weight: 800; background: linear-gradient(135deg, #a78bfa, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
   .logo span { color: var(--muted); -webkit-text-fill-color: var(--muted); font-weight: 400; font-size: 0.85rem; margin-left: 6px; }
 
   /* HERO */
-  .hero {
-    text-align: center;
-    padding: 80px 20px 48px;
-    max-width: 700px;
-    margin: 0 auto;
-  }
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(124,58,237,0.15);
-    border: 1px solid rgba(124,58,237,0.4);
-    color: #a78bfa;
-    padding: 6px 16px;
-    border-radius: 100px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin-bottom: 24px;
-    letter-spacing: 0.3px;
-  }
-  .hero h1 {
-    font-size: clamp(2rem, 5vw, 3rem);
-    font-weight: 800;
-    line-height: 1.15;
-    margin-bottom: 16px;
-    color: #fff;
-  }
-  .hero h1 .gradient {
-    background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 50%, #6366f1 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .hero p {
-    color: var(--muted);
-    font-size: 1.05rem;
-    line-height: 1.7;
-    max-width: 500px;
-    margin: 0 auto 40px;
-  }
+  .hero { text-align: center; padding: 72px 20px 40px; max-width: 700px; margin: 0 auto; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.4); color: #a78bfa; padding: 6px 16px; border-radius: 100px; font-size: 0.8rem; font-weight: 600; margin-bottom: 24px; letter-spacing: 0.3px; }
+  .hero h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; line-height: 1.15; margin-bottom: 16px; color: #fff; }
+  .hero h1 .gradient { background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 50%, #6366f1 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero p { color: var(--muted); font-size: 1.05rem; line-height: 1.7; max-width: 500px; margin: 0 auto 28px; }
+  .btn-demo { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.35); color: #a78bfa; border-radius: 10px; font-size: 0.875rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; margin-bottom: 12px; }
+  .btn-demo:hover { background: rgba(124,58,237,0.22); border-color: rgba(124,58,237,0.6); }
 
-  /* INPUT SECTION */
-  .input-section {
-    max-width: 700px;
-    margin: 0 auto;
-    padding: 0 20px 60px;
-  }
-  .input-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 32px;
-  }
-  .input-card label {
-    display: block;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--muted);
-    margin-bottom: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .input-wrapper {
-    position: relative;
-    margin-bottom: 16px;
-  }
-  .input-wrapper textarea {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--text);
-    font-size: 0.95rem;
-    padding: 14px 16px;
-    resize: vertical;
-    min-height: 110px;
-    font-family: inherit;
-    transition: border-color 0.2s;
-    line-height: 1.6;
-  }
-  .input-wrapper textarea:focus {
-    outline: none;
-    border-color: var(--purple);
-  }
+  /* INPUT */
+  .input-section { max-width: 700px; margin: 0 auto; padding: 0 20px 60px; }
+  .input-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 32px; }
+  .input-card label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .input-wrapper { position: relative; margin-bottom: 16px; }
+  .input-wrapper textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 0.95rem; padding: 14px 16px; resize: vertical; min-height: 110px; font-family: inherit; transition: border-color 0.2s; line-height: 1.6; }
+  .input-wrapper textarea:focus { outline: none; border-color: var(--purple); }
   .input-wrapper textarea::placeholder { color: #4a4a5e; }
-
-  .input-hint {
-    font-size: 0.8rem;
-    color: var(--muted);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .btn-analyze {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, #7c3aed, #6366f1);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-  }
-  .btn-analyze:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 32px rgba(124,58,237,0.4);
-  }
-  .btn-analyze:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  /* NOTICE BOX */
-  .notice-box {
-    background: rgba(245,158,11,0.1);
-    border: 1px solid rgba(245,158,11,0.3);
-    border-radius: 12px;
-    padding: 14px 18px;
-    margin-top: 16px;
-    font-size: 0.82rem;
-    color: #fbbf24;
-    line-height: 1.6;
-    display: none;
-  }
+  .input-hint { font-size: 0.8rem; color: var(--muted); margin-bottom: 20px; display: flex; align-items: center; gap: 6px; }
+  .btn-analyze { width: 100%; padding: 16px; background: linear-gradient(135deg, #7c3aed, #6366f1); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; font-family: inherit; }
+  .btn-analyze:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(124,58,237,0.4); }
+  .btn-analyze:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .notice-box { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: 12px; padding: 14px 18px; margin-top: 16px; font-size: 0.82rem; color: #fbbf24; line-height: 1.6; display: none; }
   .notice-box.show { display: block; }
 
   /* LOADING */
-  #loading {
-    display: none;
-    text-align: center;
-    padding: 48px 20px;
-  }
-  .spinner {
-    width: 48px;
-    height: 48px;
-    border: 4px solid var(--border);
-    border-top-color: var(--purple);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 20px;
-  }
+  #loading { display: none; text-align: center; padding: 60px 20px; }
+  .loader-ring { width: 56px; height: 56px; border-radius: 50%; border: 4px solid var(--border); border-top-color: var(--purple); animation: spin 0.8s linear infinite; margin: 0 auto 24px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-label { color: var(--muted); font-size: 0.9rem; }
-  .loading-sub { color: #4a4a5e; font-size: 0.78rem; margin-top: 8px; }
+  .loading-steps { display: flex; flex-direction: column; gap: 10px; max-width: 320px; margin: 0 auto; }
+  .loading-msg { font-size: 0.95rem; color: var(--text); font-weight: 600; transition: all 0.4s; }
+  .loading-sub { color: #4a4a5e; font-size: 0.78rem; margin-top: 4px; }
+  .loading-dots { display: inline-block; }
+  .loading-dots::after { content: ''; animation: dots 1.4s steps(3, end) infinite; }
+  @keyframes dots { 0%,20% { content: ''; } 40% { content: '.'; } 60% { content: '..'; } 80%,100% { content: '...'; } }
 
   /* RESULTS */
-  #results { max-width: 900px; margin: 0 auto; padding: 0 20px 80px; }
-
-  .results-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 28px;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  .results-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text);
-  }
+  #results { max-width: 960px; margin: 0 auto; padding: 0 20px 80px; }
+  .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+  .results-title { font-size: 1.1rem; font-weight: 700; }
   .results-title span { color: var(--muted); font-weight: 400; font-size: 0.9rem; margin-left: 8px; }
-
-  .btn-export {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    background: transparent;
-    border: 1px solid var(--purple);
-    color: var(--purple-light);
-    border-radius: 10px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: inherit;
-  }
+  .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn-export { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: transparent; border: 1px solid var(--purple); color: var(--purple-light); border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; }
   .btn-export:hover { background: rgba(124,58,237,0.1); }
 
   /* PROFILE CARD */
-  .profile-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    margin-bottom: 28px;
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-  .profile-card:hover { border-color: rgba(124,58,237,0.4); }
+  .profile-card { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; margin-bottom: 28px; overflow: hidden; transition: border-color 0.2s; animation: fadeUp 0.4s ease both; }
+  .profile-card:hover { border-color: rgba(124,58,237,0.35); }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
-  .card-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 24px 28px;
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-    gap: 16px;
-  }
+  /* CARD TOP */
+  .card-top { display: flex; align-items: center; justify-content: space-between; padding: 24px 28px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 16px; }
   .profile-meta { display: flex; align-items: center; gap: 16px; }
-  .avatar {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #7c3aed, #6366f1);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    font-weight: 800;
-    flex-shrink: 0;
-  }
+  .avatar { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #6366f1); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; flex-shrink: 0; }
   .profile-meta h2 { font-size: 1.1rem; font-weight: 700; }
-  .profile-meta .handle { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
-
-  .opp-badge {
-    border-radius: 12px;
-    padding: 10px 18px;
-    text-align: center;
-    min-width: 130px;
-    border: 2px solid;
-  }
+  .profile-meta .handle { color: var(--muted); font-size: 0.85rem; margin-top: 2px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .posting-tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(124,58,237,0.15); color: #a78bfa; }
+  .confidence-tag { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+  .conf-high { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .conf-med { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  .conf-low { background: rgba(239,68,68,0.15); color: #f87171; }
+  .opp-badge { border-radius: 14px; padding: 10px 18px; text-align: center; min-width: 130px; border: 2px solid; }
   .opp-badge .score { font-size: 1.8rem; font-weight: 800; line-height: 1; }
-  .opp-badge .label { font-size: 0.7rem; font-weight: 700; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .opp-badge .label { font-size: 0.68rem; font-weight: 700; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
   .opp-high { border-color: #ef4444; color: #ef4444; background: rgba(239,68,68,0.08); }
   .opp-med  { border-color: #f59e0b; color: #f59e0b; background: rgba(245,158,11,0.08); }
   .opp-low  { border-color: #22c55e; color: #22c55e; background: rgba(34,197,94,0.08); }
 
-  /* STATS ROW */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    border-bottom: 1px solid var(--border);
-  }
-  @media(max-width:560px) { .stats-row { grid-template-columns: repeat(2,1fr); } }
-  .stat-box {
-    padding: 18px 20px;
-    text-align: center;
-    border-right: 1px solid var(--border);
-  }
-  .stat-box:last-child { border-right: none; }
-  .stat-val { font-size: 1.3rem; font-weight: 700; }
-  .stat-lbl { font-size: 0.72rem; color: var(--muted); margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
+  /* SCORE SECTION */
+  .scores-section { padding: 28px 28px 20px; border-bottom: 1px solid var(--border); }
+  .scores-grid { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; }
+  @media(max-width:640px) { .scores-grid { grid-template-columns: 1fr; } }
+  .overall-circle-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .overall-circle-wrap .circle-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); }
+  .sub-scores { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; flex: 1; }
+  @media(max-width:480px) { .sub-scores { grid-template-columns: repeat(2,1fr); } }
+  .sub-score-item { display: flex; align-items: center; gap: 12px; background: var(--surface2); border-radius: 12px; padding: 12px 14px; border: 1px solid var(--border); }
+  .sub-score-item svg { flex-shrink: 0; }
+  .sub-score-meta { flex: 1; min-width: 0; }
+  .sub-score-name { font-size: 0.72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+  .sub-score-bar-wrap { background: var(--border); border-radius: 100px; height: 5px; }
+  .sub-score-bar { height: 5px; border-radius: 100px; transition: width 1s cubic-bezier(0.4,0,0.2,1); width: 0; }
+  .sub-score-num { font-size: 0.85rem; font-weight: 700; flex-shrink: 0; }
+
+  /* BENCHMARK */
+  .benchmark-section { padding: 18px 28px; border-bottom: 1px solid var(--border); }
+  .benchmark-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin-bottom: 14px; }
+  .benchmark-track { display: flex; gap: 0; border-radius: 10px; overflow: hidden; }
+  .bench-step { flex: 1; padding: 10px 14px; text-align: center; background: var(--surface2); border: 1px solid var(--border); cursor: default; }
+  .bench-step + .bench-step { border-left: none; }
+  .bench-step:first-child { border-radius: 10px 0 0 10px; }
+  .bench-step:last-child { border-radius: 0 10px 10px 0; }
+  .bench-step.active { background: rgba(124,58,237,0.18); border-color: var(--purple); }
+  .bench-title { font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+  .bench-step.active .bench-title { color: #a78bfa; }
+  .bench-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); margin: 6px auto 0; }
+  .bench-step.active .bench-dot { background: var(--purple-light); }
+
+  /* CARD BODY */
+  .card-body { padding: 0; }
+  .section-row { padding: 20px 28px; border-bottom: 1px solid var(--border); }
+  .section-row:last-child { border-bottom: none; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+  .section-title-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .section-title-label::before { content: ''; display: inline-block; width: 3px; height: 14px; border-radius: 2px; background: var(--purple); }
+  .toggle-icon { color: var(--muted); font-size: 0.7rem; transition: transform 0.2s; }
+  .section-body { margin-top: 16px; overflow: hidden; transition: max-height 0.3s ease, opacity 0.3s ease; }
+  .section-body.collapsed { max-height: 0 !important; opacity: 0; margin-top: 0; }
+
+  /* AI SUMMARY */
+  .ai-summary-box { background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(99,102,241,0.07)); border: 1px solid rgba(124,58,237,0.25); border-radius: 12px; padding: 16px 18px; }
+  .ai-chip { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg, #7c3aed, #6366f1); color: white; font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .ai-summary-text { font-size: 0.9rem; color: #c4b5fd; line-height: 1.75; font-style: italic; }
+
+  /* SWO GRID */
+  .swo-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+  @media(max-width:680px) { .swo-grid { grid-template-columns: 1fr; } }
+  .swo-card { border-radius: 12px; padding: 14px; border: 1px solid; }
+  .swo-card-strength { background: rgba(34,197,94,0.06); border-color: rgba(34,197,94,0.2); }
+  .swo-card-weakness { background: rgba(239,68,68,0.06); border-color: rgba(239,68,68,0.2); }
+  .swo-card-opp { background: rgba(124,58,237,0.06); border-color: rgba(124,58,237,0.2); }
+  .swo-card-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .swo-card-strength .swo-card-title { color: #4ade80; }
+  .swo-card-weakness .swo-card-title { color: #f87171; }
+  .swo-card-opp .swo-card-title { color: #a78bfa; }
+  .swo-bullets { display: flex; flex-direction: column; gap: 7px; }
+  .swo-bullet { font-size: 0.82rem; line-height: 1.5; display: flex; align-items: flex-start; gap: 7px; }
+  .swo-card-strength .swo-bullet { color: #86efac; }
+  .swo-card-weakness .swo-bullet { color: #fca5a5; }
+  .swo-card-opp .swo-bullet { color: #c4b5fd; }
+  .swo-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
+  .swo-card-strength .swo-dot { background: #4ade80; }
+  .swo-card-weakness .swo-dot { background: #f87171; }
+  .swo-card-opp .swo-dot { background: #a78bfa; }
+
+  /* CONTENT STRATEGY */
+  .strategy-text { font-size: 0.9rem; color: #c4b5fd; line-height: 1.75; background: rgba(124,58,237,0.07); border: 1px solid rgba(124,58,237,0.2); border-radius: 10px; padding: 14px 16px; }
+
+  /* ACTION PLAN */
+  .action-plan { display: flex; flex-direction: column; gap: 0; }
+  .action-day { display: flex; align-items: flex-start; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .action-day:last-child { border-bottom: none; }
+  .day-badge { width: 32px; height: 32px; border-radius: 8px; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3); color: #a78bfa; font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; text-align: center; line-height: 1.2; }
+  .day-action { font-size: 0.875rem; color: var(--text); line-height: 1.5; padding-top: 6px; }
+
+  /* IDEAS */
+  .ideas-list { display: flex; flex-direction: column; gap: 10px; }
+  .idea-item { display: flex; align-items: flex-start; gap: 10px; background: rgba(124,58,237,0.07); border: 1px solid rgba(124,58,237,0.18); border-radius: 10px; padding: 12px 14px; font-size: 0.875rem; color: #c4b5fd; line-height: 1.5; }
+  .idea-num { color: #7c3aed; font-weight: 800; font-size: 1rem; flex-shrink: 0; margin-top: -1px; }
+
+  /* AUDIENCE */
+  .audience-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+  @media(max-width:640px) { .audience-grid { grid-template-columns: 1fr; } }
+  .audience-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .aud-label { font-size: 0.68rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .aud-text { font-size: 0.82rem; color: var(--text); line-height: 1.5; }
+
+  /* HOOKS */
+  .hooks-grid { display: flex; flex-direction: column; gap: 10px; }
+  .hook-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .hook-text { font-size: 0.85rem; color: var(--muted); font-style: italic; flex: 1; line-height: 1.5; }
+  .hook-score-badge { padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+  .score-good { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .score-avg  { background: rgba(245,158,11,0.15); color: #fbbf24; }
+  .score-bad  { background: rgba(239,68,68,0.15); color: #f87171; }
+  .hook-issue-text { font-size: 0.75rem; color: var(--red); margin-top: 4px; width: 100%; }
+
+  /* ISSUES */
+  .issues-list { display: flex; flex-direction: column; gap: 8px; }
+  .issue-item { display: flex; align-items: flex-start; gap: 10px; background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.2); border-radius: 10px; padding: 10px 14px; font-size: 0.875rem; color: #fca5a5; line-height: 1.5; }
+
+  /* PITCH / DM */
+  .pitch-box { background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(99,102,241,0.08)); border: 1px solid rgba(124,58,237,0.3); border-radius: 12px; padding: 20px; }
+  .pitch-box-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #a78bfa; margin-bottom: 12px; }
+  .pitch-message { font-size: 0.875rem; color: #c4b5fd; line-height: 1.75; font-style: italic; }
+  .pitch-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .copy-btn { padding: 7px 16px; background: rgba(124,58,237,0.25); border: 1px solid rgba(124,58,237,0.5); color: #c4b5fd; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s; }
+  .copy-btn:hover { background: rgba(124,58,237,0.4); }
+
+  /* ERROR / EMPTY */
+  .error-card { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.25); border-radius: 14px; padding: 18px 24px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; font-size: 0.875rem; color: #fca5a5; }
+  .empty-state { text-align: center; padding: 80px 20px; color: var(--muted); }
+  .empty-icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.4; }
+
+  /* DEMO BADGE */
+  .demo-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35); color: #fbbf24; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.3px; margin-left: 10px; }
+
   .green { color: var(--green); }
   .red   { color: var(--red); }
   .amber { color: var(--amber); }
-
-  /* CARD BODY */
-  .card-body { padding: 24px 28px; }
-  .section-title {
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    color: var(--muted);
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .section-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  .issues-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
-  .issue-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    background: rgba(239,68,68,0.07);
-    border: 1px solid rgba(239,68,68,0.2);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 0.875rem;
-    color: #fca5a5;
-    line-height: 1.5;
-  }
-  .issue-icon { color: var(--red); font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
-
-  .hooks-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
-  .hook-card {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 16px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .hook-text { font-size: 0.85rem; color: var(--muted); font-style: italic; flex: 1; line-height: 1.5; }
-  .hook-score-badge {
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-  .score-good  { background: rgba(34,197,94,0.15);  color: #4ade80; }
-  .score-avg   { background: rgba(245,158,11,0.15); color: #fbbf24; }
-  .score-bad   { background: rgba(239,68,68,0.15);  color: #f87171; }
-  .hook-issue-text { font-size: 0.75rem; color: var(--red); margin-top: 4px; width: 100%; }
-
-  .recs-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
-  .rec-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    background: rgba(34,197,94,0.06);
-    border: 1px solid rgba(34,197,94,0.2);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 0.875rem;
-    color: #86efac;
-    line-height: 1.5;
-  }
-  .rec-icon { color: var(--green); flex-shrink: 0; margin-top: 1px; }
-
-  .pitch-box {
-    background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(99,102,241,0.08));
-    border: 1px solid rgba(124,58,237,0.3);
-    border-radius: 12px;
-    padding: 20px;
-  }
-  .pitch-box-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #a78bfa; margin-bottom: 12px; }
-  .pitch-message { font-size: 0.875rem; color: #c4b5fd; line-height: 1.75; font-style: italic; }
-
-  /* ERRORS */
-  .error-card {
-    background: rgba(239,68,68,0.07);
-    border: 1px solid rgba(239,68,68,0.25);
-    border-radius: 14px;
-    padding: 18px 24px;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 0.875rem;
-    color: #fca5a5;
-  }
-
-  /* EMPTY */
-  .empty-state {
-    text-align: center;
-    padding: 80px 20px;
-    color: var(--muted);
-  }
-  .empty-icon { font-size: 3rem; margin-bottom: 16px; opacity: 0.4; }
-  .empty-text { font-size: 1rem; }
-
-  .collapse-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: var(--muted);
-    font-size: 0.85rem;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-family: inherit;
-  }
-  .collapse-btn:hover { color: var(--text); }
-
-  .posting-tag {
-    display: inline-flex;
-    align-items: center;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: rgba(124,58,237,0.15);
-    color: #a78bfa;
-    margin-left: 8px;
-  }
-
-  .ai-section {
-    background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(99,102,241,0.07));
-    border: 1px solid rgba(124,58,237,0.25);
-    border-radius: 12px;
-    padding: 16px 18px;
-    margin-bottom: 20px;
-  }
-  .ai-section-label { margin-bottom: 10px; }
-  .ai-chip {
-    display: inline-block;
-    background: linear-gradient(135deg, #7c3aed, #6366f1);
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 3px 10px;
-    border-radius: 20px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .ai-summary {
-    font-size: 0.9rem;
-    color: #c4b5fd;
-    line-height: 1.7;
-    font-style: italic;
-  }
-
-  .ideas-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
-  .idea-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    background: rgba(124,58,237,0.08);
-    border: 1px solid rgba(124,58,237,0.2);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 0.875rem;
-    color: #c4b5fd;
-    line-height: 1.5;
-  }
-  .idea-icon { color: #a78bfa; flex-shrink: 0; font-size: 0.8rem; margin-top: 2px; }
-
-  .ai-dm-box { position: relative; }
-  .copy-btn {
-    margin-top: 14px;
-    display: inline-block;
-    padding: 7px 16px;
-    background: rgba(124,58,237,0.25);
-    border: 1px solid rgba(124,58,237,0.5);
-    color: #c4b5fd;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-    transition: background 0.2s;
-  }
-  .copy-btn:hover { background: rgba(124,58,237,0.4); }
 </style>
 </head>
 <body>
@@ -513,10 +230,14 @@
 <div class="hero">
   <div class="hero-badge">
     <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><circle cx="6" cy="6" r="6"/></svg>
-    Find & Close Script Writing Leads
+    Find &amp; Close Script Writing Leads
   </div>
   <h1>Turn Weak Creators Into <span class="gradient">Paying Clients</span></h1>
-  <p>Analyze any public Instagram profile's hooks, engagement, and content quality. Get a full audit report you can use to pitch your script writing services.</p>
+  <p>Analyze any public Instagram profile's hooks, engagement, and content quality. Get a full structured AI audit to pitch your script writing services.</p>
+  <button class="btn-demo" onclick="loadDemo()">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    View Demo Audit
+  </button>
 </div>
 
 <div class="input-section">
@@ -540,22 +261,53 @@
 </div>
 
 <div id="loading">
-  <div class="spinner"></div>
-  <div class="loading-label" id="loadingLabel">Scraping Instagram profiles...</div>
-  <div class="loading-sub">This can take 15–30 seconds per profile</div>
+  <div class="loader-ring"></div>
+  <div class="loading-steps">
+    <div class="loading-msg" id="loadingMsg">Analyzing engagement patterns<span class="loading-dots"></span></div>
+    <div class="loading-sub">This takes 20–40 seconds per profile</div>
+  </div>
 </div>
 
 <div id="results"></div>
 
 <script>
 let allProfileData = [];
+const dmStore = {};
+const aiStore = {};
+
+const LOADING_MSGS = [
+  "Scraping Instagram profiles",
+  "Analyzing engagement patterns",
+  "Evaluating content consistency",
+  "Scoring hook quality",
+  "Benchmarking creator profile",
+  "Identifying audience signals",
+  "Generating growth recommendations",
+  "Building structured audit report",
+  "Finalizing AI insights"
+];
+
+let loadingInterval = null;
+
+function startLoadingMessages() {
+  let idx = 0;
+  const el = document.getElementById('loadingMsg');
+  loadingInterval = setInterval(() => {
+    idx = (idx + 1) % LOADING_MSGS.length;
+    el.innerHTML = LOADING_MSGS[idx] + '<span class="loading-dots"></span>';
+  }, 2200);
+}
+
+function stopLoadingMessages() {
+  if (loadingInterval) { clearInterval(loadingInterval); loadingInterval = null; }
+}
 
 async function startAnalysis() {
   const input = document.getElementById('usernamesInput').value.trim();
   if (!input) return;
 
   const usernames = input.split('\n')
-    .map(u => u.trim().replace(/^@/, ''))
+    .map(u => u.trim().replace(/^@/, '').replace(/\s+/g,''))
     .filter(u => u.length > 0)
     .slice(0, 5);
 
@@ -565,14 +317,14 @@ async function startAnalysis() {
   const loading = document.getElementById('loading');
   const results = document.getElementById('results');
   const notice = document.getElementById('noticeBox');
-  const label = document.getElementById('loadingLabel');
 
   btn.disabled = true;
   loading.style.display = 'block';
   results.innerHTML = '';
   notice.classList.remove('show');
 
-  label.textContent = `Scraping ${usernames.length} profile${usernames.length > 1 ? 's' : ''}...`;
+  document.getElementById('loadingMsg').innerHTML = 'Scraping Instagram profiles<span class="loading-dots"></span>';
+  startLoadingMessages();
 
   try {
     const res = await fetch('/api/scrape', {
@@ -582,35 +334,38 @@ async function startAnalysis() {
     });
     const data = await res.json();
     loading.style.display = 'none';
+    stopLoadingMessages();
     btn.disabled = false;
 
     allProfileData = data.results || [];
     renderResults(data.results || [], data.errors || []);
 
-    if ((data.errors || []).length > 0) {
-      notice.classList.add('show');
-    }
+    if ((data.errors || []).length > 0) notice.classList.add('show');
   } catch (err) {
     loading.style.display = 'none';
+    stopLoadingMessages();
     btn.disabled = false;
     results.innerHTML = `<div class="error-card">⚠️ Request failed: ${err.message}. Please try again.</div>`;
   }
 }
 
-function renderResults(profiles, errors) {
+function renderResults(profiles, errors, isDemo) {
   const container = document.getElementById('results');
   if (profiles.length === 0 && errors.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">No results found.</div></div>';
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><div>No results found.</div></div>';
     return;
   }
 
   let html = '<div class="results-header">';
-  html += `<div class="results-title">Analysis Results <span>${profiles.length} profile${profiles.length !== 1 ? 's' : ''} analyzed</span></div>`;
+  const demoTag = isDemo ? '<span class="demo-badge">✦ Demo</span>' : '';
+  html += `<div class="results-title">Analysis Results${demoTag} <span>${profiles.length} profile${profiles.length !== 1 ? 's' : ''} analyzed</span></div>`;
   if (profiles.length > 0) {
-    html += `<button class="btn-export" onclick="exportReport()">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Export Full Report
-    </button>`;
+    html += `<div class="header-actions">
+      <button class="btn-export" onclick="exportReport()">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Export Full Report
+      </button>
+    </div>`;
   }
   html += '</div>';
 
@@ -618,183 +373,368 @@ function renderResults(profiles, errors) {
     html += `<div class="error-card">⚠️ @${err.username}: ${err.error}</div>`;
   });
 
-  profiles.forEach(p => {
-    html += buildProfileCard(p);
-  });
-
+  profiles.forEach(p => { html += buildProfileCard(p); });
   container.innerHTML = html;
 
-  profiles.forEach(p => {
-    populateAiText(p);
-  });
+  profiles.forEach(p => { populateAiText(p); });
+  setTimeout(() => { animateScores(); animateBars(); }, 80);
 }
 
 function buildProfileCard(p) {
   const a = p.analysis || {};
+  const ai = p.ai_insights || {};
   const engagement = a.engagement_rate || 0;
   const hookScore = a.hook_score || 0;
   const followers = p.followers || 0;
   const oppScore = a.opportunity_score || 0;
   const oppLabel = a.opportunity_label || 'Unknown';
   const consistency = a.posting_consistency || 'Unknown';
+  const username = p.username || 'unknown';
 
-  const engColor = engagement < 1 ? 'red' : engagement < 3 ? 'amber' : 'green';
-  const hookColor = hookScore < 45 ? 'red' : hookScore < 70 ? 'amber' : 'green';
   const oppClass = oppScore >= 75 ? 'opp-high' : oppScore >= 50 ? 'opp-med' : 'opp-low';
 
-  let issuesHtml = '';
-  (a.top_issues || []).forEach(issue => {
-    issuesHtml += `<div class="issue-item"><span class="issue-icon">✕</span>${issue}</div>`;
-  });
+  const overall = ai.overall_score || 0;
+  const branding = ai.branding_score || 0;
+  const engScore = ai.engagement_score || 0;
+  const consist = ai.consistency_score || 0;
+  const growth = ai.growth_score || 0;
+
+  const overallColor = overall >= 70 ? '#22c55e' : overall >= 45 ? '#f59e0b' : '#ef4444';
+  const confidence = ai.confidence_level || 'Medium';
+  const confClass = confidence === 'High' ? 'conf-high' : confidence === 'Low' ? 'conf-low' : 'conf-med';
+
+  const benchLevel = getBenchmark(followers, engagement);
 
   let hooksHtml = '';
   (a.hook_breakdown || []).slice(0, 4).forEach(hb => {
     const sc = hb.score || 0;
     const cls = sc >= 70 ? 'score-good' : sc >= 45 ? 'score-avg' : 'score-bad';
     const issueNote = hb.issues && hb.issues.length ? `<div class="hook-issue-text">↳ ${hb.issues[0]}</div>` : '';
-    hooksHtml += `
-      <div class="hook-card">
-        <div class="hook-text">"${hb.hook || 'No caption'}"</div>
-        <div class="hook-score-badge ${cls}">${sc}/100</div>
-        ${issueNote}
-      </div>`;
+    hooksHtml += `<div class="hook-card"><div class="hook-text">"${escHtml(hb.hook || '')}"</div><div class="hook-score-badge ${cls}">${sc}/100</div>${issueNote}</div>`;
   });
 
-  let recsHtml = '';
-  (a.recommendations || []).forEach(rec => {
-    recsHtml += `<div class="rec-item"><span class="rec-icon">→</span>${rec}</div>`;
+  let issuesHtml = '';
+  (a.top_issues || []).forEach(issue => {
+    issuesHtml += `<div class="issue-item"><span style="color:var(--red);flex-shrink:0">✕</span>${escHtml(issue)}</div>`;
   });
 
-  const avgLikes = formatNum(a.avg_likes || 0);
-  const avgComments = formatNum(a.avg_comments || 0);
+  const strengthsHtml = (ai.strengths || []).map(s =>
+    `<div class="swo-bullet"><span class="swo-dot"></span><span class="ai-text" data-key="str-${username}-${(ai.strengths||[]).indexOf(s)}"></span></div>`).join('');
+  const weaknessesHtml = (ai.weaknesses || []).map((w, i) =>
+    `<div class="swo-bullet"><span class="swo-dot"></span><span class="ai-text" data-key="wk-${username}-${i}"></span></div>`).join('');
+  const oppsHtml = (ai.opportunities || []).map((o, i) =>
+    `<div class="swo-bullet"><span class="swo-dot"></span><span class="ai-text" data-key="op-${username}-${i}"></span></div>`).join('');
+
+  const actionPlanHtml = (ai.action_plan || []).map((_, i) =>
+    `<div class="action-day"><div class="day-badge">D${i+1}</div><div class="day-action ai-text" data-key="plan-${username}-${i}"></div></div>`).join('');
+
+  const ideasHtml = (ai.content_ideas || []).map((_, i) =>
+    `<div class="idea-item"><span class="idea-num">${i+1}</span><span class="ai-text" data-key="idea-${username}-${i}"></span></div>`).join('');
+
+  aiStore[username] = ai;
+  if (ai.dm_message) dmStore[username] = ai.dm_message;
 
   return `
   <div class="profile-card">
     <div class="card-top">
       <div class="profile-meta">
-        <div class="avatar">${(p.username || '?')[0].toUpperCase()}</div>
+        <div class="avatar">${(username[0]||'?').toUpperCase()}</div>
         <div>
-          <h2>@${p.username || 'unknown'}</h2>
-          <div class="handle">${p.full_name || ''} · <span class="posting-tag">${consistency}</span></div>
+          <h2>@${escHtml(username)}</h2>
+          <div class="handle">
+            ${escHtml(p.full_name || '')}
+            <span class="posting-tag">${escHtml(consistency)}</span>
+            <span class="confidence-tag ${confClass}">${escHtml(confidence)} Confidence</span>
+          </div>
         </div>
       </div>
       <div class="opp-badge ${oppClass}">
         <div class="score">${oppScore}</div>
-        <div class="label">${oppLabel}</div>
+        <div class="label">${escHtml(oppLabel)}</div>
       </div>
     </div>
 
-    <div class="stats-row">
-      <div class="stat-box">
-        <div class="stat-val">${formatNum(followers)}</div>
-        <div class="stat-lbl">Followers</div>
+    <div class="scores-section">
+      <div class="scores-grid">
+        <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;flex:1">
+          <div class="overall-circle-wrap">
+            ${scoreCircle(overall, overallColor, 42, 'Overall Score', true)}
+          </div>
+          <div class="sub-scores" style="flex:1;min-width:240px">
+            ${subScoreBar('Branding', branding, username)}
+            ${subScoreBar('Engagement', engScore, username)}
+            ${subScoreBar('Consistency', consist, username)}
+            ${subScoreBar('Growth', growth, username)}
+          </div>
+        </div>
       </div>
-      <div class="stat-box">
-        <div class="stat-val ${engColor}">${engagement}%</div>
-        <div class="stat-lbl">Engagement Rate</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-val">${avgLikes}</div>
-        <div class="stat-lbl">Avg Likes</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-val ${hookColor}">${hookScore}/100</div>
-        <div class="stat-lbl">Hook Score</div>
+    </div>
+
+    <div class="benchmark-section">
+      <div class="benchmark-label">Creator Benchmark</div>
+      <div class="benchmark-track">
+        <div class="bench-step ${benchLevel===0?'active':''}">
+          <div class="bench-title">Beginner</div>
+          <div class="bench-dot"></div>
+        </div>
+        <div class="bench-step ${benchLevel===1?'active':''}">
+          <div class="bench-title">Growing</div>
+          <div class="bench-dot"></div>
+        </div>
+        <div class="bench-step ${benchLevel===2?'active':''}">
+          <div class="bench-title">Advanced</div>
+          <div class="bench-dot"></div>
+        </div>
       </div>
     </div>
 
     <div class="card-body">
-      <div class="section-title">Key Issues</div>
-      <div class="issues-list">${issuesHtml || '<div class="issue-item">No major issues detected</div>'}</div>
+      <div class="section-row">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title-label">✦ AI Audit Summary</div>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="section-body" style="max-height:500px">
+          <div class="ai-summary-box">
+            <div class="ai-chip">✦ Gemini AI</div>
+            <p class="ai-summary-text ai-text" data-key="sum-${username}"></p>
+          </div>
+        </div>
+      </div>
 
-      <div class="section-title">Recent Hook Analysis</div>
-      <div class="hooks-grid">${hooksHtml || '<div style="color:var(--muted);font-size:0.85rem">No posts analyzed</div>'}</div>
+      <div class="section-row">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title-label">Strengths · Weaknesses · Opportunities</div>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="section-body" style="max-height:1000px">
+          <div class="swo-grid">
+            <div class="swo-card swo-card-strength">
+              <div class="swo-card-title">✓ Strengths</div>
+              <div class="swo-bullets">${strengthsHtml}</div>
+            </div>
+            <div class="swo-card swo-card-weakness">
+              <div class="swo-card-title">✕ Weaknesses</div>
+              <div class="swo-bullets">${weaknessesHtml}</div>
+            </div>
+            <div class="swo-card swo-card-opp">
+              <div class="swo-card-title">✦ Opportunities</div>
+              <div class="swo-bullets">${oppsHtml}</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <div class="section-title">Your Sales Talking Points</div>
-      <div class="recs-list">${recsHtml}</div>
+      ${ai.content_strategy ? `
+      <div class="section-row">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title-label">Content Strategy</div>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="section-body" style="max-height:400px">
+          <div class="strategy-text ai-text" data-key="strategy-${username}"></div>
+        </div>
+      </div>` : ''}
 
-      ${buildAiSection(p)}
+      ${actionPlanHtml ? `
+      <div class="section-row">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title-label">7-Day Action Plan</div>
+          <span class="toggle-icon">▶</span>
+        </div>
+        <div class="section-body collapsed" style="max-height:700px">
+          <div class="action-plan">${actionPlanHtml}</div>
+        </div>
+      </div>` : ''}
+
+      ${ideasHtml ? `
+      <div class="section-row">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title-label">AI Content Ideas</div>
+          <span class="toggle-icon">▶</span>
+        </div>
+        <div class="section-body collapsed" style="max-height:800px">
+          <div class="ideas-list">${ideasHtml}</div>
+        </div>
+      </div>` : ''}
+
+      ${(ai.audience_analysis && (ai.audience_analysis.type || ai.audience_analysis.behavior)) ? `
+      <div class="section-row">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title-label">Audience Analysis</div>
+          <span class="toggle-icon">▶</span>
+        </div>
+        <div class="section-body collapsed" style="max-height:400px">
+          <div class="audience-grid">
+            <div class="audience-card">
+              <div class="aud-label">Audience Type</div>
+              <div class="aud-text ai-text" data-key="aud-type-${username}"></div>
+            </div>
+            <div class="audience-card">
+              <div class="aud-label">Engagement Behavior</div>
+              <div class="aud-text ai-text" data-key="aud-beh-${username}"></div>
+            </div>
+            <div class="audience-card">
+              <div class="aud-label">Content Preference</div>
+              <div class="aud-text ai-text" data-key="aud-pref-${username}"></div>
+            </div>
+          </div>
+        </div>
+      </div>` : ''}
+
+      ${hooksHtml ? `
+      <div class="section-row">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title-label">Recent Hook Analysis</div>
+          <span class="toggle-icon">▶</span>
+        </div>
+        <div class="section-body collapsed" style="max-height:600px">
+          <div class="hooks-grid">${hooksHtml}</div>
+        </div>
+      </div>` : ''}
+
+      ${issuesHtml ? `
+      <div class="section-row">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title-label">Key Issues</div>
+          <span class="toggle-icon">▶</span>
+        </div>
+        <div class="section-body collapsed" style="max-height:400px">
+          <div class="issues-list">${issuesHtml}</div>
+        </div>
+      </div>` : ''}
+
+      <div class="section-row">
+        <div class="section-header" onclick="toggleSection(this)">
+          <div class="section-title-label">✦ AI-Written Outreach DM</div>
+          <span class="toggle-icon">▼</span>
+        </div>
+        <div class="section-body" style="max-height:500px">
+          <div class="pitch-box">
+            <div class="pitch-message ai-text" data-key="dm-${username}"></div>
+            <div class="pitch-actions">
+              <button class="copy-btn" data-username="${username}" onclick="copyDM(this)">Copy DM</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>`;
 }
 
-const dmStore = {};
+function scoreCircle(score, color, r, label, large) {
+  const circ = 2 * Math.PI * r;
+  const size = large ? 110 : 70;
+  const cx = size / 2, cy = size / 2;
+  const sw = large ? 9 : 7;
+  const fontSize = large ? 22 : 16;
+  return `<div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+    <svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#2a2a38" stroke-width="${sw}"/>
+      <circle class="score-arc" cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}"
+        stroke-linecap="round" stroke-dasharray="0 ${circ.toFixed(2)}"
+        transform="rotate(-90 ${cx} ${cy})"
+        data-target="${((score/100)*circ).toFixed(2)}" data-circ="${circ.toFixed(2)}"/>
+      <text x="${cx}" y="${cy+6}" text-anchor="middle" fill="white" font-size="${fontSize}" font-weight="700" font-family="Inter,system-ui,sans-serif">${score}</text>
+    </svg>
+    <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">${label}</div>
+  </div>`;
+}
 
-function buildAiSection(p) {
-  const ai = p.ai_insights || {};
-  const summary = ai.audit_summary || '';
-  const ideas = ai.content_ideas || [];
-  const dm = ai.dm_message || '';
-  const username = p.username || 'unknown';
+function subScoreBar(label, score, username) {
+  const color = score >= 70 ? '#22c55e' : score >= 45 ? '#f59e0b' : '#ef4444';
+  return `<div class="sub-score-item">
+    <div class="sub-score-meta">
+      <div class="sub-score-name">${label}</div>
+      <div class="sub-score-bar-wrap">
+        <div class="sub-score-bar" data-width="${score}" style="background:${color}"></div>
+      </div>
+    </div>
+    <div class="sub-score-num" style="color:${color}">${score}</div>
+  </div>`;
+}
 
-  let html = '';
+function getBenchmark(followers, engagement) {
+  if (followers > 100000 || engagement > 5) return 2;
+  if (followers > 10000 && engagement >= 1) return 1;
+  return 0;
+}
 
-  if (summary) {
-    html += '<div class="ai-section"><div class="ai-section-label"><span class="ai-chip">✦ Gemini AI Audit</span></div>'
-          + '<p class="ai-summary ai-text" data-key="sum-' + username + '"></p></div>';
-  }
+function toggleSection(header) {
+  const body = header.nextElementSibling;
+  const icon = header.querySelector('.toggle-icon');
+  body.classList.toggle('collapsed');
+  icon.textContent = body.classList.contains('collapsed') ? '▶' : '▼';
+}
 
-  if (ideas.length) {
-    let ideasInner = '';
-    ideas.forEach((_, i) => {
-      ideasInner += '<div class="idea-item"><span class="idea-icon">✦</span>'
-                  + '<span class="ai-text" data-key="idea-' + username + '-' + i + '"></span></div>';
-    });
-    html += '<div class="section-title">AI Content Ideas for Their Niche</div>'
-          + '<div class="ideas-list">' + ideasInner + '</div>';
-  }
+function animateScores() {
+  document.querySelectorAll('.score-arc').forEach(arc => {
+    const target = parseFloat(arc.dataset.target);
+    const circ = parseFloat(arc.dataset.circ);
+    let start = null;
+    function step(ts) {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / 1100, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      arc.setAttribute('stroke-dasharray', `${(target * eased).toFixed(2)} ${circ}`);
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+}
 
-  if (dm) {
-    dmStore[username] = dm;
-    html += '<div class="pitch-box ai-dm-box">'
-          + '<div class="pitch-box-title">✦ AI-Written Outreach DM</div>'
-          + '<div class="pitch-message ai-text" data-key="dm-' + username + '"></div>'
-          + '<button class="copy-btn" data-username="' + username + '" onclick="copyDM(this)">Copy DM</button>'
-          + '</div>';
-  } else {
-    const name = p.full_name || ('@' + username);
-    html += '<div class="pitch-box"><div class="pitch-box-title">📨 Suggested DM Outreach</div>'
-          + '<div class="pitch-message ai-text" data-key="fallback-' + username + '"></div></div>';
-    dmStore['fallback-' + username] = 'Hey ' + name + '! Love what you\'re creating. I noticed your hooks could be pulling in a lot more views. I help creators like you write scroll-stopping scripts and content ideas that actually convert. Want a free sample script?';
-  }
-
-  return html;
+function animateBars() {
+  document.querySelectorAll('.sub-score-bar').forEach(bar => {
+    const w = bar.dataset.width || 0;
+    setTimeout(() => { bar.style.width = w + '%'; }, 100);
+  });
 }
 
 function populateAiText(p) {
   const ai = p.ai_insights || {};
   const username = p.username || 'unknown';
 
-  const sumEl = document.querySelector('[data-key="sum-' + username + '"]');
-  if (sumEl) sumEl.textContent = ai.audit_summary || '';
+  function set(key, val) {
+    const el = document.querySelector(`[data-key="${key}"]`);
+    if (el && val) el.textContent = val;
+  }
 
-  (ai.content_ideas || []).forEach((idea, i) => {
-    const el = document.querySelector('[data-key="idea-' + username + '-' + i + '"]');
-    if (el) el.textContent = idea;
-  });
+  set('sum-' + username, ai.audit_summary || '');
+  set('strategy-' + username, ai.content_strategy || '');
+  set('dm-' + username, ai.dm_message || '');
 
-  const dmEl = document.querySelector('[data-key="dm-' + username + '"]');
-  if (dmEl) dmEl.textContent = ai.dm_message || '';
+  (ai.strengths || []).forEach((s, i) => set(`str-${username}-${i}`, s));
+  (ai.weaknesses || []).forEach((w, i) => set(`wk-${username}-${i}`, w));
+  (ai.opportunities || []).forEach((o, i) => set(`op-${username}-${i}`, o));
+  (ai.action_plan || []).forEach((a, i) => set(`plan-${username}-${i}`, a));
+  (ai.content_ideas || []).forEach((idea, i) => set(`idea-${username}-${i}`, idea));
 
-  const fbEl = document.querySelector('[data-key="fallback-' + username + '"]');
-  if (fbEl) fbEl.textContent = dmStore['fallback-' + username] || '';
+  const aud = ai.audience_analysis || {};
+  set('aud-type-' + username, aud.type || '');
+  set('aud-beh-' + username, aud.behavior || '');
+  set('aud-pref-' + username, aud.preference || '');
 }
 
 function copyDM(btn) {
   const username = btn.getAttribute('data-username');
-  const text = dmStore[username] || '';
+  const ai = aiStore[username] || {};
+  const text = ai.dm_message || dmStore[username] || '';
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = 'Copied!';
     setTimeout(() => { btn.textContent = 'Copy DM'; }, 2000);
   });
 }
 
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 async function exportReport() {
   if (!allProfileData.length) return;
   const btn = document.querySelector('.btn-export');
+  const orig = btn.innerHTML;
   btn.textContent = 'Generating...';
   btn.disabled = true;
-
   try {
     const res = await fetch('/api/report', {
       method: 'POST',
@@ -811,20 +751,105 @@ async function exportReport() {
   } catch (err) {
     alert('Export failed: ' + err.message);
   } finally {
-    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M4 6l3 3 3-3M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Export Full Report`;
+    btn.innerHTML = orig;
     btn.disabled = false;
   }
 }
 
 function formatNum(n) {
-  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
-  if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+  if (n >= 1000000) return (n/1000000).toFixed(1)+'M';
+  if (n >= 1000) return (n/1000).toFixed(1)+'K';
   return String(Math.round(n));
 }
 
 document.getElementById('usernamesInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter' && e.ctrlKey) startAnalysis();
 });
+
+/* ===== DEMO DATA ===== */
+const DEMO_PROFILE = {
+  username: "alexfit_daily",
+  full_name: "Alex Rivera",
+  followers: 18400,
+  biography: "Fitness & nutrition coach 💪 | Helping busy people lose weight without the gym | DM FREE for my meal plan",
+  posts: [],
+  analysis: {
+    engagement_rate: 1.2,
+    avg_likes: 187,
+    avg_comments: 34,
+    hook_score: 38,
+    hook_quality: "Weak",
+    posting_consistency: "Moderate (weekly-ish)",
+    opportunity_score: 82,
+    opportunity_label: "High Priority Lead",
+    top_issues: [
+      "Very low engagement rate (1.2%) — content isn't resonating with followers",
+      "Hooks are weak — first lines fail to stop the scroll or create curiosity",
+      "Posting inconsistency is hurting algorithmic reach",
+      "Captions are too short — not building enough context or storytelling"
+    ],
+    recommendations: [],
+    hook_breakdown: [
+      { hook: "Good morning! New workout video is up", score: 22, issues: ["Hook starts with a weak/generic phrase"], strengths: [] },
+      { hook: "What I eat in a day as a fitness coach", score: 55, issues: [], strengths: ["Good hook length"] },
+      { hook: "The #1 mistake killing your weight loss results?", score: 78, issues: [], strengths: ["Uses engaging language", "Ends with engaging punctuation"] },
+      { hook: "Check out my new meal prep recipe!", score: 15, issues: ["Hook starts with a weak/generic phrase"], strengths: [] }
+    ]
+  },
+  ai_insights: {
+    overall_score: 34,
+    branding_score: 62,
+    engagement_score: 28,
+    consistency_score: 45,
+    growth_score: 71,
+    strengths: [
+      "Clear niche positioning around busy people losing weight — a high-demand problem with a massive audience",
+      "Bio includes a lead magnet (free meal plan) showing basic understanding of conversion funnels",
+      "18K followers provides a solid foundation to build momentum from with the right content strategy"
+    ],
+    weaknesses: [
+      "Engagement rate of 1.2% is critically below the 3-5% benchmark for fitness creators at this size",
+      "7 of 10 hooks start with generic phrases — zero scroll-stopping power, they get scrolled past in milliseconds",
+      "Average caption length under 60 words means missed storytelling opportunities that drive saves and shares"
+    ],
+    opportunities: [
+      "Rewriting hooks alone could 3-4x engagement — the audience already exists, content just needs to perform",
+      "Before/after transformation content is the highest-performing fitness format and is completely absent",
+      "A meal prep series with exact macros and timing could become a weekly viral recurring content pillar"
+    ],
+    content_strategy: "Pivot from announcement-style posts to story-driven content documenting client transformations and your expertise journey. Lead every post with a hook that creates a curiosity gap specific to busy people struggling with weight loss. Pair 4 educational posts per week with one personal story post to build both authority and trust.",
+    action_plan: [
+      "Rewrite the hooks on your 3 most recent posts and repost them with updated captions and fresh energy",
+      "Film a 60-second 'biggest fitness myth' Reel — pick one myth your audience definitely believes",
+      "Post a before/after client transformation with their specific numbers and timeline in the caption",
+      "Engage for 30 minutes in your niche — comment on 15 fitness accounts with thoughtful, value-driven replies",
+      "Create a 7-day meal prep guide and tease it across 3 stories with a DM CTA to collect leads",
+      "Film a 'What I eat in a day' with exact macros — this format consistently drives saves in fitness niches",
+      "Review your week's analytics, identify your best-performing post, and create 3 direct variations of that format"
+    ],
+    content_ideas: [
+      "\"Why you're not losing weight despite eating 'healthy'\" — myth-busting format that drives massive saves in fitness niches",
+      "\"I analyzed 100 fitness accounts to find what actually goes viral\" — data-driven hook establishes authority instantly",
+      "\"The 15-minute workout I do when I have zero motivation\" — relatable pain point drives comments, shares, and saves",
+      "\"What a real fitness coach's meal prep actually looks like (no BS)\" — authenticity post builds trust and retention",
+      "\"I gave my client exactly what she asked for — here's what happened\" — story hook creates irresistible curiosity clicks"
+    ],
+    audience_analysis: {
+      type: "Busy professionals aged 25-40 seeking practical fitness results without spending hours in the gym",
+      behavior: "Currently scrolling passively — not saving, sharing, or commenting, suggesting content isn't triggering strong enough value signals to earn action",
+      preference: "Responds strongly to practical how-to content, transformation proof, and content that validates and respects their time constraints"
+    },
+    confidence_level: "High",
+    audit_summary: "Alex's fitness account is chronically underperforming for its follower count — 18K followers should be generating 3-5x the current engagement. The core problem is hooks: most posts open with generic phrases that get scrolled past in milliseconds. The audience exists and is interested; the content just isn't giving them a reason to stop, save, or share.",
+    dm_message: "Hey Alex! Checked out your fitness content — love the niche around busy people losing weight, it's genuinely underserved. Noticed your engagement is way below what your follower count should be pulling, and honestly it comes down to the first line of every post. I write scroll-stopping scripts and hooks for fitness coaches that typically 3-4x their engagement in 30 days. Want me to rewrite one of your recent posts for free so you can see exactly what I mean?"
+  }
+};
+
+function loadDemo() {
+  allProfileData = [DEMO_PROFILE];
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  renderResults([DEMO_PROFILE], [], true);
+}
 </script>
 </body>
 </html>
