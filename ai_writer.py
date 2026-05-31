@@ -11,6 +11,60 @@ def _get_client():
     return genai.Client(api_key=GOOGLE_API_KEY)
 
 
+def _detect_creator_tier(followers: int, engagement: float, is_verified: bool) -> str:
+    if is_verified or followers >= 500000:
+        return "large"
+    if followers >= 50000 or (followers >= 10000 and engagement >= 3.0):
+        return "mid"
+    return "small"
+
+
+def _detect_niche(bio: str, hooks: list) -> str:
+    combined = (bio + " " + " ".join(hooks)).lower()
+    niche_map = {
+        "fitness": ["fitness", "gym", "workout", "weight loss", "muscle", "nutrition", "diet", "health", "coach"],
+        "business": ["entrepreneur", "business", "income", "money", "invest", "finance", "wealth", "passive income", "sales"],
+        "gaming": ["gaming", "gamer", "stream", "twitch", "youtube", "game", "play", "esport"],
+        "education": ["learn", "teach", "course", "tips", "how to", "tutorial", "guide", "knowledge", "study"],
+        "lifestyle": ["lifestyle", "travel", "luxury", "aesthetic", "vlog", "day in", "routine", "fashion", "style"],
+        "commentary": ["opinion", "reaction", "commentary", "take", "rant", "review", "thoughts on"],
+        "personal_brand": ["story", "journey", "mindset", "motivation", "personal", "growth", "self"],
+    }
+    scores = {}
+    for niche, keywords in niche_map.items():
+        scores[niche] = sum(1 for kw in keywords if kw in combined)
+    top = max(scores, key=scores.get)
+    return top if scores[top] > 0 else "personal_brand"
+
+
+def _tier_context(tier: str, niche: str) -> str:
+    tier_guidance = {
+        "large": (
+            "This is a large or verified creator. Frame insights around retention, audience depth, format diversification, "
+            "and brand expansion — not basic growth fundamentals. Avoid framing them as 'failing' without nuance. "
+            "Focus on optimizing an already established presence."
+        ),
+        "mid": (
+            "This is a mid-size creator in a growth phase. Focus on positioning clarity, content differentiation, "
+            "consistency systems, and capitalizing on momentum. Avoid treating them as a beginner."
+        ),
+        "small": (
+            "This is a smaller creator still building their audience. Emphasize experimentation, audience-building, "
+            "hook development, and finding their content-market fit. Be encouraging but realistic."
+        ),
+    }
+    niche_guidance = {
+        "fitness": "Fitness niche: prioritize transformation proof, practical how-to formats, authority hooks, and habit-building content.",
+        "business": "Business niche: prioritize credibility signals, case studies, proof of results, and educational authority content.",
+        "gaming": "Gaming niche: prioritize pacing, reaction formats, challenge content, community hooks, and consistency with platform-specific formats.",
+        "education": "Education niche: prioritize knowledge sequencing, retention hooks, authority positioning, and value-first formats.",
+        "lifestyle": "Lifestyle niche: prioritize aspirational framing, visual consistency, relatable storytelling, and trend alignment.",
+        "commentary": "Commentary niche: prioritize strong takes, contrarian angles, discussion-driving hooks, and timely relevance.",
+        "personal_brand": "Personal brand niche: prioritize storytelling, vulnerability, consistent voice, and positioning around a clear transformation or value promise.",
+    }
+    return f"{tier_guidance.get(tier, tier_guidance['small'])}\n{niche_guidance.get(niche, '')}"
+
+
 def generate_ai_insights(profile: dict, analysis: dict) -> dict:
     client = _get_client()
     if not client:
@@ -20,6 +74,7 @@ def generate_ai_insights(profile: dict, analysis: dict) -> dict:
     full_name = profile.get("full_name", "") or f"@{username}"
     bio = profile.get("biography", "")
     followers = profile.get("followers", 0)
+    is_verified = profile.get("is_verified", False)
     engagement = analysis.get("engagement_rate", 0)
     hook_score = analysis.get("hook_score", 0)
     hook_quality = analysis.get("hook_quality", "")
@@ -27,102 +82,134 @@ def generate_ai_insights(profile: dict, analysis: dict) -> dict:
     issues = analysis.get("top_issues", [])
     posts = profile.get("posts", [])
     consistency = analysis.get("posting_consistency", "Unknown")
+    post_count = len(posts)
 
+    tier = _detect_creator_tier(followers, engagement, is_verified)
     recent_hooks = [p.get("hook", "") for p in posts[:6] if p.get("hook")]
-    hooks_text = "\n".join(f'- "{h}"' for h in recent_hooks) if recent_hooks else "No hooks available"
+    niche = _detect_niche(bio, recent_hooks)
+    tier_ctx = _tier_context(tier, niche)
 
-    prompt = f"""You are a senior Instagram growth strategist producing a premium creator audit report.
+    hooks_text = "\n".join(f'- "{h}"' for h in recent_hooks) if recent_hooks else "No hooks available"
+    confidence_note = "Low" if post_count < 3 else ("Medium" if post_count < 6 else "High")
+
+    prompt = f"""You are a senior creator intelligence analyst producing a structured growth report. Your outputs must be measured, evidence-aware, and analytically credible — not motivational or exaggerated.
 
 CREATOR DATA:
 - Username: @{username}
 - Name: {full_name}
 - Bio: {bio}
 - Followers: {followers:,}
+- Verified: {is_verified}
 - Engagement Rate: {engagement}%
 - Hook Score: {hook_score}/100 ({hook_quality})
 - Posting Consistency: {consistency}
 - Lead Priority: {opp_label}
-- Key Issues: {"; ".join(issues)}
+- Key Diagnosed Issues: {"; ".join(issues)}
+- Posts Analyzed: {post_count}
 
-RECENT HOOKS FROM THEIR POSTS:
+RECENT OBSERVABLE HOOKS:
 {hooks_text}
 
-Output EXACTLY the sections below in order. Be specific, data-driven, and reference their actual content. No generic advice.
+TIER & NICHE CONTEXT:
+{tier_ctx}
+
+IMPORTANT STYLE RULES — follow exactly:
+- Use measured language: "may suggest", "appears to", "could indicate", "directional signal", "observable pattern"
+- DO NOT claim certainty about things inferred from limited public data
+- DO NOT use fake percentages like "63% increase" — use qualitative descriptions instead
+- DO NOT repeat the same recommendation across sections — each section must add new information
+- Adapt framing to creator tier: large creators should not be called "failing"; small creators get growth-focused advice
+- Acknowledge data limitations naturally where relevant
+- Sound analytical and strategic, not motivational or AI-guru-like
+
+Output EXACTLY the sections below in order.
 
 ---OVERALL_SCORE---
-[Single integer 0-100. Weak hooks + low engagement + inconsistent posting = lower score. Be honest.]
+[Single integer 0-100. Base it on observable data honestly. Large verified creators with active engagement should score higher.]
 
 ---SCORES---
-Branding: [0-100, rate bio clarity, niche focus, profile cohesion]
-Engagement: [0-100, benchmark engagement rate: <1% = 15-30, 1-3% = 30-55, 3-6% = 55-75, >6% = 75-95]
-Consistency: [0-100, daily = 85-100, few days = 65-85, weekly = 40-65, infrequent = 10-40]
-Growth: [0-100, overall growth trajectory signal based on content quality and engagement]
+Branding: [0-100]
+Engagement: [0-100. Benchmarks: <1% = 10-30, 1-3% = 30-55, 3-6% = 55-75, >6% = 75-95]
+Consistency: [0-100. Daily = 80-100, few days = 60-80, weekly = 35-60, infrequent = 10-35]
+Growth: [0-100]
+
+---SCORE_DRIVERS---
+Branding drivers: [2-3 specific observable factors that influenced the branding score]
+Engagement drivers: [2-3 specific factors — engagement rate vs benchmark, hook quality]
+Consistency drivers: [Observable posting frequency pattern note]
+Growth drivers: [What signals growth potential or risk]
+
+---OBSERVED_SIGNALS---
+- [Specific observable pattern from actual hook or bio data]
+- [Second specific observable signal]
+- [Third observable signal]
+- [Optional fourth signal]
 
 ---STRENGTHS---
-- [Specific strength referencing their actual data or bio]
+- [Specific strength referencing observable data — analytical framing]
 - [Second specific strength]
 - [Third specific strength]
 
 ---WEAKNESSES---
-- [Specific weakness with data reference e.g. engagement rate or hook score]
+- [Specific weakness with measured framing — reference observable data]
 - [Second specific weakness]
 - [Third specific weakness]
 
 ---OPPORTUNITIES---
-- [Concrete growth opportunity #1 — specific and actionable]
-- [Concrete growth opportunity #2]
-- [Concrete growth opportunity #3]
+- [Concrete strategic opportunity — directional, not guaranteed. Niche-specific.]
+- [Second opportunity — different information from weaknesses]
+- [Third opportunity]
 
 ---CONTENT_STRATEGY---
-[2-3 punchy sentences on exactly what content strategy this creator should adopt. Niche-specific. No fluff.]
+[2-3 concise analytical sentences on what approach appears most aligned with this creator's niche and audience signals. No filler.]
 
 ---ACTION_PLAN---
-Day 1: [Specific, concrete action]
-Day 2: [Specific, concrete action]
-Day 3: [Specific, concrete action]
-Day 4: [Specific, concrete action]
-Day 5: [Specific, concrete action]
-Day 6: [Specific, concrete action]
-Day 7: [Specific, concrete action]
+Day 1: [Specific concrete action tied to observed issues]
+Day 2: [Specific concrete action]
+Day 3: [Specific concrete action]
+Day 4: [Specific concrete action]
+Day 5: [Specific concrete action]
+Day 6: [Specific concrete action]
+Day 7: [Specific concrete action]
 
 ---CONTENT_IDEAS---
-1. [Viral idea — include a hook line and one-sentence explanation, niche-specific]
-2. [Viral idea — include a hook line and one-sentence explanation, niche-specific]
-3. [Viral idea — include a hook line and one-sentence explanation, niche-specific]
-4. [Viral idea — include a hook line and one-sentence explanation, niche-specific]
-5. [Viral idea — include a hook line and one-sentence explanation, niche-specific]
+1. [Viral idea with hook line — niche-specific. One sentence on why it fits this creator.]
+2. [Different format/angle from idea 1]
+3. [Viral idea]
+4. [Viral idea]
+5. [Viral idea]
 
 ---AUDIENCE_ANALYSIS---
-Type: [One sentence describing the likely audience demographic and psychographic]
-Behavior: [One sentence on current engagement behavior patterns]
-Preference: [One sentence on what content format this audience responds best to]
+Type: [One analytical sentence on likely audience — framed as directional based on bio and niche]
+Behavior: [One sentence on apparent engagement behavior patterns]
+Preference: [One sentence on likely preferred content formats based on niche and signals]
 
 ---CONFIDENCE---
-[High if 6+ posts analyzed and bio is clear. Medium if limited data. Low if almost no data.]
+{confidence_note} [One sentence explaining why — reference post count or data availability]
 
 ---EXECUTIVE_SUMMARY---
-Position: [One precise sentence on where this creator stands today — be specific with numbers]
-Blocker: [The single biggest specific thing preventing growth — data-referenced, blunt]
-Opportunity: [The single highest-leverage action available right now — specific and actionable]
-Direction: [One strategic sentence on their optimal path forward over the next 90 days]
+Position: [One precise analytical sentence — reference specific data points]
+Blocker: [Most significant observable pattern limiting growth — measured framing]
+Opportunity: [Most actionable strategic direction based on visible signals]
+Direction: [One strategic sentence on a realistic 60-90 day focus — tier-appropriate]
 
 ---QUICK_WINS---
-- [Action they can do TODAY with immediate impact — hyper-specific]
-- [Second quick win — doable this week]
-- [Third quick win — low effort, high reward]
+- [Specific immediately actionable step — doable today, tied to observed data]
+- [Second quick win — different from priority fixes]
+- [Third quick win]
 
 ---PRIORITY_FIXES---
-- [Most impactful problem to fix first — specific, data-referenced]
-- [Second priority fix — ranked by growth impact]
+- [Most impactful observable issue to address — specific, measured, ranked by likely impact]
+- [Second priority fix — new information, not repeated from elsewhere]
 - [Third priority fix]
 
 ---LONG_TERM_OPPORTUNITIES---
-- [Strategic play for 3-6 months that could 2-5x their growth — niche-specific]
+- [Strategic play for 3-6 months — niche-specific, tier-appropriate. No guaranteed growth claims.]
 - [Second long-term strategic opportunity]
-- [Third long-term opportunity]
+- [Third]
 
 ---WEEKLY_CHECKLIST---
-- [Weekly habit #1 for consistent algorithmic growth]
+- [Weekly operational habit #1 — specific and niche-aware]
 - [Weekly habit #2]
 - [Weekly habit #3]
 - [Weekly habit #4]
@@ -131,10 +218,10 @@ Direction: [One strategic sentence on their optimal path forward over the next 9
 - [Weekly habit #7]
 
 ---AUDIT_SUMMARY---
-[2-3 blunt, specific sentences summarizing why this creator underperforms and the core fix. Reference their niche and numbers.]
+[2-3 analytically grounded sentences. Reference observable data. Avoid hyperbole. Acknowledge data limitations.]
 
 ---DM_MESSAGE---
-[Natural, personalized DM 3-5 sentences. Reference their bio or a specific hook. End with free sample script CTA. Sound like a human, not a bot.]"""
+[Personalized human-sounding outreach DM. 3-4 sentences. Reference something specific from their bio or content. End with a soft offer of free help. Sound like a real person, not a sales bot. No guaranteed results claims.]"""
 
     try:
         response = client.models.generate_content(
@@ -142,12 +229,12 @@ Direction: [One strategic sentence on their optimal path forward over the next 9
             contents=prompt,
         )
         text = response.text
-        return _parse_structured_response(text, full_name, username, analysis)
+        return _parse_structured_response(text, full_name, username, analysis, tier, niche)
     except Exception:
         return _fallback_insights(profile, analysis)
 
 
-def _parse_structured_response(text: str, full_name: str, username: str, analysis: dict) -> dict:
+def _parse_structured_response(text: str, full_name: str, username: str, analysis: dict, tier: str = "small", niche: str = "personal_brand") -> dict:
     def extract(marker_start, marker_end=None):
         start = text.find(marker_start)
         if start == -1:
@@ -162,7 +249,7 @@ def _parse_structured_response(text: str, full_name: str, username: str, analysi
         m = re.search(r'\d+', s)
         return max(0, min(100, int(m.group()))) if m else default
 
-    def extract_bullets(s):
+    def extract_bullets(s, max_items=3):
         lines = []
         for line in s.split('\n'):
             line = line.strip()
@@ -170,12 +257,12 @@ def _parse_structured_response(text: str, full_name: str, username: str, analysi
                 cleaned = line.lstrip('-•').strip()
                 if cleaned:
                     lines.append(cleaned)
-        return lines[:3]
+        return lines[:max_items]
 
     overall_raw = extract("---OVERALL_SCORE---", "---SCORES---")
     overall_score = extract_number(overall_raw, 50)
 
-    scores_raw = extract("---SCORES---", "---STRENGTHS---")
+    scores_raw = extract("---SCORES---", "---SCORE_DRIVERS---")
     branding_score = engagement_score = consistency_score = growth_score = 50
     for line in scores_raw.split('\n'):
         if 'Branding:' in line:
@@ -186,6 +273,18 @@ def _parse_structured_response(text: str, full_name: str, username: str, analysi
             consistency_score = extract_number(line, 50)
         elif 'Growth:' in line:
             growth_score = extract_number(line, 50)
+
+    drivers_raw = extract("---SCORE_DRIVERS---", "---OBSERVED_SIGNALS---")
+    score_drivers = {"branding": [], "engagement": [], "consistency": [], "growth": []}
+    for line in drivers_raw.split('\n'):
+        line = line.strip()
+        for key in score_drivers:
+            prefix = f"{key} drivers:"
+            if line.lower().startswith(prefix):
+                rest = line[len(prefix):].strip()
+                score_drivers[key] = [f.strip() for f in rest.split(',') if f.strip()]
+
+    observed_signals = extract_bullets(extract("---OBSERVED_SIGNALS---", "---STRENGTHS---"), max_items=4)
 
     strengths = extract_bullets(extract("---STRENGTHS---", "---WEAKNESSES---"))
     weaknesses = extract_bullets(extract("---WEAKNESSES---", "---OPPORTUNITIES---"))
@@ -226,10 +325,11 @@ def _parse_structured_response(text: str, full_name: str, username: str, analysi
 
     confidence_raw = extract("---CONFIDENCE---", "---EXECUTIVE_SUMMARY---").strip()
     confidence = "Medium"
-    if "High" in confidence_raw:
+    if confidence_raw.lower().startswith("high"):
         confidence = "High"
-    elif "Low" in confidence_raw:
+    elif confidence_raw.lower().startswith("low"):
         confidence = "Low"
+    confidence_note = re.sub(r'^(High|Medium|Low)\s*', '', confidence_raw, flags=re.IGNORECASE).strip()
 
     exec_raw = extract("---EXECUTIVE_SUMMARY---", "---QUICK_WINS---")
     exec_summary = {"position": "", "blocker": "", "opportunity": "", "direction": ""}
@@ -241,34 +341,37 @@ def _parse_structured_response(text: str, full_name: str, username: str, analysi
 
     if not exec_summary.get("position"):
         eng = analysis.get("engagement_rate", 0)
-        issues = analysis.get("top_issues", [])
-        hook_q = analysis.get("hook_quality", "weak")
+        issues_list = analysis.get("top_issues", [])
+        hook_q = analysis.get("hook_quality", "average")
         exec_summary = {
-            "position": f"@{username} generates {eng:.1f}% engagement — {'below' if eng < 3 else 'near'} the 3–5% benchmark for growing creators in their niche",
-            "blocker": issues[0] if issues else f"Hook quality is {hook_q.lower()} — most posts are failing to stop the scroll before the content can land",
-            "opportunity": "Improving hook quality and posting consistency are the two highest-leverage fixes available right now",
-            "direction": "Prioritize content quality and consistency over the next 30–60 days before expanding into new formats or platforms"
+            "position": f"@{username} shows a {eng:.1f}% engagement rate — observable signals suggest {'below-benchmark' if eng < 3 else 'near-benchmark'} performance for their follower tier",
+            "blocker": issues_list[0] if issues_list else f"Hook quality appears {hook_q.lower()} based on observable post patterns — opening lines may not be generating sufficient scroll-stops",
+            "opportunity": "Improving hook construction and posting regularity appear to be the most actionable directions based on available signals",
+            "direction": "A focused 60-day effort on content quality and consistency may help establish clearer algorithmic momentum"
         }
 
-    quick_wins_raw = extract_bullets(extract("---QUICK_WINS---", "---PRIORITY_FIXES---"))
-    priority_fixes_raw = extract_bullets(extract("---PRIORITY_FIXES---", "---LONG_TERM_OPPORTUNITIES---"))
-    long_term_raw = extract_bullets(extract("---LONG_TERM_OPPORTUNITIES---", "---WEEKLY_CHECKLIST---"))
+    quick_wins = extract_bullets(extract("---QUICK_WINS---", "---PRIORITY_FIXES---"))
+    priority_fixes = extract_bullets(extract("---PRIORITY_FIXES---", "---LONG_TERM_OPPORTUNITIES---"))
+    long_term = extract_bullets(extract("---LONG_TERM_OPPORTUNITIES---", "---WEEKLY_CHECKLIST---"))
 
-    quick_wins = quick_wins_raw if quick_wins_raw else [
-        "Rewrite the hooks on your 3 most recent posts today — no new content needed",
-        "Add a bold question or stat to your next post's opening line before publishing",
-        "Reply to every comment on your last 5 posts to boost algorithmic engagement signals"
-    ]
-    priority_fixes = priority_fixes_raw if priority_fixes_raw else [
-        f"Fix hook quality immediately — {analysis.get('hook_quality','weak').lower()} hooks are suppressing reach on every post",
-        f"Boost engagement from {analysis.get('engagement_rate',0):.1f}% toward 3%+ through storytelling-led captions",
-        "Establish a 3–5 post per week cadence — inconsistent posting actively kills algorithmic momentum"
-    ]
-    long_term = long_term_raw if long_term_raw else [
-        "Build a signature weekly content series that creates appointment viewing and audience loyalty",
-        "Develop a DM-based lead magnet that converts followers to an owned email or contact list",
-        "Collaborate with 3–5 complementary creators to cross-pollinate audiences and accelerate growth"
-    ]
+    if not quick_wins:
+        quick_wins = [
+            "Revisit the opening line of your most recent posts and test a question or bold claim format",
+            "Add a specific CTA to your next post before publishing — saves and comments signal quality to the algorithm",
+            "Respond to existing comments on recent posts to activate engagement signals this week"
+        ]
+    if not priority_fixes:
+        priority_fixes = [
+            f"Hook construction appears to be limiting reach — {analysis.get('hook_quality','average').lower()} signals suggest opening lines may not be stopping the scroll",
+            f"Engagement of {analysis.get('engagement_rate',0):.1f}% appears below the expected range — caption structure and CTA patterns may be contributing factors",
+            "Posting regularity appears inconsistent — scheduled publishing could help maintain algorithmic visibility"
+        ]
+    if not long_term:
+        long_term = [
+            "Developing a recurring weekly content format may help build appointment-style viewership and audience loyalty",
+            "Building an owned channel (email list or DM lead magnet) could reduce platform dependency as the audience grows",
+            "Strategic collaborations with complementary creators in the niche may accelerate growth through cross-exposure"
+        ]
 
     checklist_raw = extract("---WEEKLY_CHECKLIST---", "---AUDIT_SUMMARY---")
     weekly_checklist = []
@@ -281,26 +384,30 @@ def _parse_structured_response(text: str, full_name: str, username: str, analysi
     weekly_checklist = weekly_checklist[:7]
     if not weekly_checklist:
         weekly_checklist = [
-            "Post 3–5 times with a scroll-stopping hook leading every single caption",
-            "Spend 20 minutes engaging authentically in your niche's comment sections",
-            "Review last week's analytics and double down on your highest-performing format",
-            "Film or write 3 pieces of content in advance to protect your consistency",
-            "Check and respond to every DM and comment within 24 hours",
-            "Research one trending topic or format in your niche this week",
-            "Add 5 new content ideas to your bank based on what's resonating right now"
+            "Publish 3-5 posts with intentional curiosity-driven hooks on each",
+            "Spend time engaging in your niche's comment sections to build visibility",
+            "Review last week's analytics and identify which format appeared to perform strongest",
+            "Prepare content in advance to maintain a consistent posting cadence",
+            "Respond to comments and DMs within 24 hours to sustain engagement signals",
+            "Research one trending topic or format within your niche this week",
+            "Add new content ideas to your bank based on what's resonating in your space"
         ]
 
     summary = extract("---AUDIT_SUMMARY---", "---DM_MESSAGE---")
     dm = extract("---DM_MESSAGE---")
 
     if not strengths:
-        strengths = ["Established presence with an existing audience to build on",
-                     "Content niche has demonstrated market demand",
-                     "Posting history provides clear patterns to optimize from"]
+        strengths = [
+            "An existing audience base provides a foundation to build from",
+            "Content niche shows clear audience demand based on category signals",
+            "Observable posting history allows pattern analysis and optimization"
+        ]
     if not weaknesses:
-        weaknesses = [f"Engagement rate of {analysis.get('engagement_rate', 0)}% needs improvement",
-                      "Hook quality not consistently stopping the scroll",
-                      "Content differentiation from competitors is unclear"]
+        weaknesses = [
+            f"Engagement of {analysis.get('engagement_rate', 0):.1f}% appears below typical benchmarks for this follower tier",
+            f"Hook quality signals ({analysis.get('hook_quality','average').lower()}) suggest opening lines may not be generating strong scroll-stops",
+            "Content differentiation from similar creators is not immediately apparent from observable signals"
+        ]
 
     return {
         "overall_score": overall_score,
@@ -308,6 +415,11 @@ def _parse_structured_response(text: str, full_name: str, username: str, analysi
         "engagement_score": engagement_score,
         "consistency_score": consistency_score,
         "growth_score": growth_score,
+        "score_drivers": score_drivers,
+        "observed_signals": observed_signals,
+        "creator_tier": tier,
+        "detected_niche": niche,
+        "confidence_note": confidence_note,
         "strengths": strengths,
         "weaknesses": weaknesses,
         "opportunities": opportunities,
@@ -331,12 +443,12 @@ def rewrite_and_humanise_hook(hook: str) -> str:
     if not client:
         return f"[AI unavailable] Could not rewrite: {hook}"
 
-    rewrite_prompt = f"""You are a viral Instagram content expert. Rewrite the following weak hook into a powerful, scroll-stopping opening line.
+    rewrite_prompt = f"""You are an Instagram content strategist. Rewrite the following hook into a stronger, more compelling opening line.
 
 Rules:
 - Keep it under 15 words
-- Use one of these proven formats: curiosity gap, bold claim, direct question, contrarian statement, or numbered list opener
-- Make it feel punchy and urgent
+- Use one format: curiosity gap, bold claim, direct question, contrarian statement, or numbered opener
+- Make it punchy and specific — avoid generic motivational phrasing
 - Do NOT explain yourself, just write the hook
 
 Original hook: "{hook}"
@@ -350,16 +462,16 @@ Rewritten hook:"""
         )
         rewritten = rewrite_response.text.strip().strip('"').strip("'")
 
-        humanise_prompt = f"""Take this AI-generated hook and rewrite it so it sounds completely natural and human — like a real creator typed it, not a robot.
+        humanise_prompt = f"""Take this hook and make it sound completely natural — like a real creator typed it, not an AI.
 
 Rules:
-- Remove any phrases that sound corporate, over-polished, or like marketing copy
-- Make it feel casual, direct, and genuine
-- Keep the same message and power but make it conversational
-- Do NOT add explanations, just return the final hook text only
+- Remove corporate, over-polished, or marketing-copy phrasing
+- Make it feel direct and conversational
+- Keep the same core message and impact
+- Do NOT add explanations, just return the final text only
 - Keep it under 15 words
 
-AI hook: "{rewritten}"
+Hook: "{rewritten}"
 
 Human version:"""
 
@@ -370,20 +482,33 @@ Human version:"""
         return human_response.text.strip().strip('"').strip("'")
 
     except Exception:
-        return f"Rewrite failed for: {hook}"
+        return f"Rewrite unavailable for: {hook}"
 
 
 def _fallback_insights(profile: dict, analysis: dict) -> dict:
     username = profile.get("username", "")
     full_name = profile.get("full_name", "") or f"@{username}"
-    hook_quality = analysis.get("hook_quality", "weak")
+    hook_quality = analysis.get("hook_quality", "average")
     engagement = analysis.get("engagement_rate", 0)
     hook_score = analysis.get("hook_score", 0)
     opp_score = analysis.get("opportunity_score", 50)
+    followers = profile.get("followers", 0)
+    is_verified = profile.get("is_verified", False)
+    posts = profile.get("posts", [])
+    bio = profile.get("biography", "")
+    recent_hooks = [p.get("hook", "") for p in posts[:6] if p.get("hook")]
+    tier = _detect_creator_tier(followers, engagement, is_verified)
+    niche = _detect_niche(bio, recent_hooks)
 
     overall_score = max(10, min(85, 100 - opp_score + 10))
     eng_score = max(10, min(80, int(engagement * 15)))
     h_score = max(10, min(90, hook_score))
+
+    tier_position = {
+        "large": f"@{username} maintains a significant presence with {followers:,} followers — analysis is based on observable public engagement signals",
+        "mid": f"@{username} is in an active growth phase with {followers:,} followers — engagement signals suggest room for optimization",
+        "small": f"@{username} is in the early audience-building stage with {followers:,} followers — directional signals indicate growth opportunities",
+    }
 
     return {
         "overall_score": overall_score,
@@ -391,83 +516,98 @@ def _fallback_insights(profile: dict, analysis: dict) -> dict:
         "engagement_score": eng_score,
         "consistency_score": 50,
         "growth_score": 60,
+        "score_drivers": {
+            "branding": ["Bio clarity and niche focus", "Tone consistency across posts"],
+            "engagement": [f"Engagement rate of {engagement:.1f}% vs benchmark", "Hook quality signal"],
+            "consistency": ["Observable posting frequency pattern"],
+            "growth": ["Content quality signals", "Audience size relative to engagement"],
+        },
+        "observed_signals": [
+            f"Observable engagement rate of {engagement:.1f}% appears {'below' if engagement < 3 else 'near'} the expected range for this follower tier",
+            f"Hook analysis suggests {hook_quality.lower()} opening line construction across recent posts",
+            "Posting consistency appears to be a contributing factor based on available data",
+        ],
+        "creator_tier": tier,
+        "detected_niche": niche,
+        "confidence_note": f"Based on {len(posts)} publicly observable posts",
         "strengths": [
-            "Established audience base to build momentum from",
-            "Content niche shows clear audience demand",
-            "Posting history provides patterns to optimize"
+            "Existing audience base provides a foundation to iterate from",
+            "Content niche appears to have clear audience demand",
+            "Observable posting history allows directional pattern analysis"
         ],
         "weaknesses": [
-            f"Engagement rate of {engagement}% is below platform benchmarks",
-            f"Hook quality is {hook_quality.lower()} — content isn't stopping the scroll",
-            "Content strategy lacks clear differentiation from competitors"
+            f"Engagement rate of {engagement:.1f}% appears below typical benchmarks for this follower tier",
+            f"Hook construction signals ({hook_quality.lower()}) suggest opening lines may not be generating strong scroll-stops",
+            "Content differentiation from similar creators is not immediately apparent from observable patterns"
         ],
         "opportunities": [
-            "Rewriting hooks with curiosity gaps could 2-3x engagement within 30 days",
-            "Introducing story-driven formats could significantly boost saves and shares",
-            "Consistent posting schedule could improve algorithmic reach by 40-60%"
+            "Improving hook construction may increase scroll-stop rates — the audience appears to exist but engagement with current opening lines may be limited",
+            "Introducing more story-driven caption formats could improve saves and shares based on niche patterns",
+            "A more consistent posting cadence could improve algorithmic reach over the medium term"
         ],
-        "content_strategy": "Focus on scroll-stopping hooks combined with value-driven storytelling. Establish 3 core content pillars that speak directly to your niche audience's pain points and aspirations. Every post needs a hook, story, and CTA.",
+        "content_strategy": "Based on observable signals, a shift toward curiosity-driven hooks combined with structured storytelling appears most aligned with this niche. Establishing 2-3 repeatable content formats may help build recognition and reduce content creation friction over time.",
         "action_plan": [
-            "Audit your last 12 posts and identify your 3 highest-performing content formats",
-            "Rewrite hooks for your next 5 posts using curiosity gap or bold claim format",
-            "Post one piece of content using your strongest proven format",
-            "Engage with 20 accounts in your niche to boost algorithmic visibility",
-            "Research top 5 competitors and note which content formats get the most saves",
-            "Create a content bank of 10 ideas mapped to your audience's top pain points",
-            "Schedule your next 7 posts in advance and review weekly metrics"
+            "Review your last 12 posts and identify which format received the most engagement relative to reach",
+            "Rewrite the opening line of your next 3 posts using a curiosity gap or direct question format",
+            "Post one piece of content using your strongest historically performing format",
+            "Spend time engaging authentically in your niche's comment sections",
+            "Review top-performing accounts in your niche and note which content formats drive the most saves",
+            "Develop a content bank of ideas mapped to your audience's observable interests",
+            "Review analytics from the week and identify which content type showed the strongest engagement signal"
         ],
         "content_ideas": [
-            "\"3 mistakes most creators in your niche make (and how I fixed mine)\" — myth-busting format drives saves",
-            "A day-in-the-life showing your behind-the-scenes process — builds authenticity and trust",
-            "\"Unpopular opinion:\" contrarian take on a common belief — sparks debate and comments",
-            "Before/after transformation with specific numbers and timeline — proof-driven content",
-            "\"What nobody tells you about [your niche]\" — reveals a hidden truth your audience craves"
+            "A 'common mistakes in [your niche]' format — myth-busting content tends to drive saves across most niches",
+            "A behind-the-scenes or process-reveal post — authenticity signals tend to build trust and retention",
+            "A contrarian take on a widely held belief in your niche — strong opinion content drives discussion",
+            "A before/after or transformation format with specific observable details — proof-based content builds credibility",
+            "A 'what nobody tells you about [your niche]' angle — hidden-truth framing tends to drive saves"
         ],
         "audience_analysis": {
-            "type": "Core niche followers with passive consumption habits looking for value and inspiration",
-            "behavior": "Currently engaging at below-average rates, suggesting content isn't triggering strong emotional responses",
-            "preference": "Likely responds better to educational, story-driven content over promotional or generic posts"
+            "type": f"Based on bio and niche signals, the likely audience appears interested in {niche.replace('_', ' ')}-related content and outcomes",
+            "behavior": "Current engagement signals suggest a passive consumption pattern — content may not be generating strong enough responses to drive saves and shares",
+            "preference": "Based on niche patterns, this audience likely responds to practical, specific, outcome-oriented content over generic inspirational posts"
         },
         "confidence_level": "Medium",
         "executive_summary": {
-            "position": f"@{username} has {profile.get('followers', 0):,} followers but is significantly underperforming with a {engagement}% engagement rate",
-            "blocker": f"Weak hook quality ({hook_quality.lower()} score) means most posts are getting scrolled past before the content can land",
-            "opportunity": "Rewriting the first line of every post with a curiosity gap or bold claim is the single highest-leverage fix available right now",
-            "direction": "Prioritize hook quality and posting consistency for the next 30 days before expanding into new content formats"
+            "position": tier_position.get(tier, f"@{username} shows a {engagement:.1f}% engagement rate based on observable public signals"),
+            "blocker": f"Hook quality signals ({hook_quality.lower()}) suggest opening lines may be the primary friction point — content may get scrolled past before the value lands",
+            "opportunity": "Improving the first line of every post appears to be the most actionable direction based on available signal data",
+            "direction": "A focused 60-day effort on hook construction and posting consistency appears most aligned with the current growth stage"
         },
         "quick_wins": [
-            "Rewrite the hooks on your 3 most recent posts and update the captions today",
-            "Add a bold question or stat to your next post's opening line before you publish it",
-            "Reply to every comment on your last 5 posts to signal engagement to the algorithm"
+            "Revisit the opening line of your 3 most recent posts and test a question or bold claim format",
+            "Add a specific call-to-action to your next post before publishing — saves signal content quality to the algorithm",
+            "Reply to all existing comments on recent posts to activate engagement signals this week"
         ],
         "priority_fixes": [
-            f"Fix hook quality immediately — {hook_quality.lower()} hooks are costing you reach on every single post",
-            f"Boost engagement rate from {engagement}% toward the 3%+ benchmark through content format changes",
-            "Establish a consistent posting rhythm — irregular posting actively suppresses algorithmic reach"
+            f"Hook construction appears to be limiting reach — {hook_quality.lower()} signals suggest opening lines may not be stopping the scroll",
+            f"Engagement of {engagement:.1f}% appears below expected range — caption structure and CTA patterns may be contributing factors",
+            "Posting regularity appears inconsistent — scheduled publishing could help maintain algorithmic visibility"
         ],
         "long_term_opportunities": [
-            "Build a signature content series that runs weekly — creates appointment viewing and loyalty",
-            "Develop a lead magnet in your bio that converts followers to an owned email or DM list",
-            "Collaborate with 3-5 complementary creators in your niche to cross-pollinate audiences"
+            "Developing a recurring content series could build appointment-style viewership and loyalty over time",
+            "Building an owned channel (email list or DM lead magnet) could reduce platform dependency as the audience grows",
+            "Strategic collaborations with complementary creators in the niche may accelerate audience growth through cross-exposure"
         ],
         "weekly_checklist": [
-            "Post 3-5 times with scroll-stopping hooks on every caption",
-            "Spend 20 minutes engaging in your niche's comment sections",
-            "Review last week's analytics and identify your highest-performing post format",
-            "Create 3 pieces of content in advance to maintain consistency",
-            "Check and respond to every DM and comment within 24 hours",
-            "Research one trending topic or format in your niche this week",
-            "Update your content bank with 5 new ideas based on what's performing in your niche"
+            "Publish 3-5 posts with intentional curiosity-driven hooks leading each caption",
+            "Spend time engaging in your niche's comment sections to build visibility",
+            "Review last week's analytics and identify which format appeared to perform strongest",
+            "Prepare content in advance to maintain a consistent posting cadence",
+            "Respond to comments and DMs within 24 hours to sustain engagement signals",
+            "Research one trending topic or format within your niche this week",
+            "Add new content ideas to your bank based on what's resonating in your space"
         ],
         "audit_summary": (
-            f"@{username}'s content is leaving significant reach on the table. "
-            f"With a {engagement}% engagement rate and {hook_quality.lower()} hooks, "
-            f"their posts aren't breaking through the algorithm the way they should be."
+            f"@{username}'s observable signals suggest {'significant' if engagement < 1 else 'moderate'} room for optimization. "
+            f"With a {engagement:.1f}% engagement rate and {hook_quality.lower()} hook signals, "
+            f"the primary pattern appears to be content not generating sufficient scroll-stops. "
+            f"Insights are directional and based on {len(posts)} publicly observable posts."
         ),
         "dm_message": (
-            f"Hey {full_name}! I've been following your content and love what you're building. "
-            f"I noticed your posts could be pulling way more engagement with some tweaks to the hooks and content angles. "
-            f"I help creators write scroll-stopping scripts and viral content ideas. "
-            f"Want me to send over a free sample script for one of your next posts?"
+            f"Hey {full_name}! I've been looking at your content and I think there's a real opportunity here. "
+            f"Based on what I can see, your engagement signals suggest the hooks might be the main thing holding back the reach. "
+            f"I help creators write stronger opening lines and content scripts that tend to improve engagement. "
+            f"Want me to put together a free rewrite of one of your recent posts so you can see what a difference the hook makes?"
         ),
     }

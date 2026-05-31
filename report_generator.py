@@ -13,26 +13,57 @@ def _exec_summary_html(exec_summary: dict) -> str:
     blk = _esc(exec_summary.get("blocker",""))
     opp = _esc(exec_summary.get("opportunity",""))
     dire = _esc(exec_summary.get("direction",""))
-    return f"""<div style="padding:24px 32px;border-bottom:1px solid #f1f5f9;background:linear-gradient(135deg,#faf5ff,#f5f3ff)">
-      <div style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#6366f1);color:white;font-size:0.68rem;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px">✦ Executive Summary</div>
+    return f"""<div style="padding:24px 32px;border-bottom:1px solid #f1f5f9;background:#fafbff">
+      <div style="font-size:0.68rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:14px">Executive Summary</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
         <div style="background:white;border:1px solid #e2e8f0;border-radius:10px;padding:14px">
           <div style="font-size:0.66rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Current Position</div>
-          <div style="font-size:0.84rem;color:#1e293b;line-height:1.5">{pos}</div>
+          <div style="font-size:0.84rem;color:#1e293b;line-height:1.6">{pos}</div>
         </div>
         <div style="background:white;border:1px solid #fecaca;border-radius:10px;padding:14px">
-          <div style="font-size:0.66rem;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">⚡ Growth Blocker</div>
-          <div style="font-size:0.84rem;color:#1e293b;line-height:1.5">{blk}</div>
+          <div style="font-size:0.66rem;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Observed Blocker</div>
+          <div style="font-size:0.84rem;color:#1e293b;line-height:1.6">{blk}</div>
         </div>
         <div style="background:white;border:1px solid #bbf7d0;border-radius:10px;padding:14px">
-          <div style="font-size:0.66rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">✦ Top Opportunity</div>
-          <div style="font-size:0.84rem;color:#1e293b;line-height:1.5">{opp}</div>
+          <div style="font-size:0.66rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Strategic Opportunity</div>
+          <div style="font-size:0.84rem;color:#1e293b;line-height:1.6">{opp}</div>
         </div>
-        <div style="background:white;border:1px solid #ede9fe;border-radius:10px;padding:14px">
-          <div style="font-size:0.66rem;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">→ Strategic Direction</div>
-          <div style="font-size:0.84rem;color:#1e293b;line-height:1.5">{dire}</div>
+        <div style="background:white;border:1px solid #e2e8f0;border-radius:10px;padding:14px">
+          <div style="font-size:0.66rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Recommended Direction</div>
+          <div style="font-size:0.84rem;color:#1e293b;line-height:1.6">{dire}</div>
         </div>
       </div>
+    </div>"""
+
+
+def _observed_signals_html(signals: list, data_note: str) -> str:
+    if not signals:
+        return ""
+    items = ''.join(f'<div style="display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;margin-bottom:7px"><div style="width:6px;height:6px;border-radius:50%;background:#f59e0b;flex-shrink:0;margin-top:6px"></div><div style="font-size:0.84rem;color:#78350f;line-height:1.55">{_esc(s)}</div></div>' for s in signals)
+    note_html = f'<div style="font-size:0.75rem;color:#94a3b8;margin-bottom:10px;display:flex;align-items:flex-start;gap:6px"><span style="flex-shrink:0;margin-top:1px">&#9432;</span>{_esc(data_note)}</div>' if data_note else ''
+    return f"""<div style="padding:24px 32px;border-bottom:1px solid #f1f5f9">
+      <div class="section-title">Observed Signals</div>
+      {note_html}
+      {items}
+    </div>"""
+
+
+def _score_drivers_html(score_drivers: dict) -> str:
+    if not score_drivers:
+        return ""
+    labels = {"branding": "Branding Score", "engagement": "Engagement Score", "consistency": "Consistency Score", "growth": "Growth Score"}
+    cards = ""
+    for key, label in labels.items():
+        items = score_drivers.get(key, [])
+        if not items:
+            continue
+        bullets = ''.join(f'<div style="font-size:0.78rem;color:#475569;line-height:1.4;display:flex;gap:6px;margin-bottom:4px"><span style="color:#94a3b8;flex-shrink:0">–</span>{_esc(item)}</div>' for item in items)
+        cards += f'<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px"><div style="font-size:0.66rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">{label}</div>{bullets}</div>'
+    if not cards:
+        return ""
+    return f"""<div style="padding:24px 32px;border-bottom:1px solid #f1f5f9">
+      <div class="section-title">Score Methodology</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">{cards}</div>
     </div>"""
 
 
@@ -156,6 +187,11 @@ def generate_report_html(profiles: list, base_url: str = "") -> str:
         audit_summary = ai.get("audit_summary", "")
         dm_message = ai.get("dm_message", "")
         content_strategy = ai.get("content_strategy", "")
+        data_note = analysis.get("data_note", "")
+        observed_signals = ai.get("observed_signals", [])
+        score_drivers = ai.get("score_drivers", {})
+        tier_label = {"small": "Growth Phase", "mid": "Mid-Size Creator", "large": "Established Creator"}.get(ai.get("creator_tier", "small"), "Growth Phase")
+        niche_label = (ai.get("detected_niche", "personal brand") or "personal brand").replace("_", " ").title()
 
         if opp_score >= 75:
             opp_color = "#ef4444"; opp_bg = "#fef2f2"
@@ -179,8 +215,10 @@ def generate_report_html(profiles: list, base_url: str = "") -> str:
                 <h2 style="font-size:1.3rem;font-weight:700;color:#1e293b">@{_esc(username)}</h2>
                 <div style="color:#64748b;font-size:0.85rem;margin-top:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                   {_esc(p.get('full_name',''))}
-                  <span style="background:#ede9fe;color:#7c3aed;padding:2px 8px;border-radius:20px;font-size:0.72rem;font-weight:600">{_esc(consistency)}</span>
+                  <span style="background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:20px;font-size:0.72rem;font-weight:600">{_esc(consistency)}</span>
                   <span style="background:{conf_bg};color:{conf_color};padding:2px 8px;border-radius:20px;font-size:0.72rem;font-weight:600">{confidence} Confidence</span>
+                  <span style="background:#f0fdf4;color:#15803d;padding:2px 8px;border-radius:20px;font-size:0.72rem;font-weight:600">{_esc(tier_label)}</span>
+                  <span style="background:#f8fafc;color:#64748b;padding:2px 8px;border-radius:20px;font-size:0.72rem;font-weight:600">{_esc(niche_label)}</span>
                 </div>
               </div>
             </div>
@@ -217,23 +255,28 @@ def generate_report_html(profiles: list, base_url: str = "") -> str:
 
           {_exec_summary_html(ai.get("executive_summary", {}))}
 
+          {_observed_signals_html(observed_signals, data_note)}
+
           <div style="padding:24px 32px;border-bottom:1px solid #f1f5f9">
-            <div class="section-title">✦ AI Audit Summary</div>
-            <div style="background:linear-gradient(135deg,#faf5ff,#f5f3ff);border:1px solid #e9d5ff;border-radius:12px;padding:18px">
-              <div style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#6366f1);color:white;font-size:0.7rem;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">✦ Gemini AI</div>
-              <p style="font-size:0.9rem;color:#4c1d95;line-height:1.75;font-style:italic">{_esc(audit_summary)}</p>
+            <div class="section-title">AI Audit Summary</div>
+            {f'<div style="font-size:0.75rem;color:#94a3b8;margin-bottom:10px">{_esc(data_note)}</div>' if data_note else ''}
+            <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:18px">
+              <div style="font-size:0.68rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">AI Analysis</div>
+              <p style="font-size:0.88rem;color:#334155;line-height:1.8">{_esc(audit_summary)}</p>
             </div>
           </div>
 
           {_qw_pf_html(ai.get("quick_wins", []), ai.get("priority_fixes", []))}
 
           {'<div style="padding:24px 32px;border-bottom:1px solid #f1f5f9"><div class="section-title">Strengths · Weaknesses · Opportunities</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">' +
-            f'<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px"><div style="font-size:0.72rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">✓ Strengths</div><ul style="list-style:none">{strengths_html}</ul></div>' +
-            f'<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:16px"><div style="font-size:0.72rem;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">✕ Weaknesses</div><ul style="list-style:none">{weaknesses_html}</ul></div>' +
-            f'<div style="background:#f5f3ff;border:1px solid #ede9fe;border-radius:12px;padding:16px"><div style="font-size:0.72rem;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">✦ Opportunities</div><ul style="list-style:none">{opps_html}</ul></div>' +
+            f'<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px"><div style="font-size:0.72rem;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Strengths</div><ul style="list-style:none">{strengths_html}</ul></div>' +
+            f'<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:16px"><div style="font-size:0.72rem;font-weight:700;color:#dc2626;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Weaknesses</div><ul style="list-style:none">{weaknesses_html}</ul></div>' +
+            f'<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px"><div style="font-size:0.72rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Opportunities</div><ul style="list-style:none">{opps_html}</ul></div>' +
             '</div></div>' if (strengths_html or weaknesses_html or opps_html) else ''}
 
-          {f'<div style="padding:24px 32px;border-bottom:1px solid #f1f5f9"><div class="section-title">Content Strategy</div><div style="background:#f5f3ff;border:1px solid #ede9fe;border-radius:10px;padding:14px 16px;font-size:0.9rem;color:#4c1d95;line-height:1.75">{_esc(content_strategy)}</div></div>' if content_strategy else ''}
+          {_score_drivers_html(score_drivers)}
+
+          {f'<div style="padding:24px 32px;border-bottom:1px solid #f1f5f9"><div class="section-title">Content Strategy</div><div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;font-size:0.875rem;color:#334155;line-height:1.8">{_esc(content_strategy)}</div></div>' if content_strategy else ''}
 
           {f'<div style="padding:24px 32px;border-bottom:1px solid #f1f5f9"><div class="section-title">7-Day Action Plan</div>{action_plan_html}</div>' if action_plan_html else ''}
 
@@ -255,9 +298,9 @@ def generate_report_html(profiles: list, base_url: str = "") -> str:
 
           {f'<div style="padding:24px 32px;border-bottom:1px solid #f1f5f9"><div class="section-title">Key Issues</div><ul style="list-style:none">{issues_html}</ul></div>' if issues_html else ''}
 
-          <div style="padding:28px 32px;background:linear-gradient(135deg,#ede9fe,#ddd6fe)">
-            <div style="font-size:0.75rem;font-weight:700;color:#5b21b6;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px">✦ AI-Written Outreach DM</div>
-            <p style="font-size:0.9rem;color:#4c1d95;line-height:1.75;font-style:italic">{_esc(dm_message) if dm_message else 'No message generated.'}</p>
+          <div style="padding:28px 32px;background:#f8fafc;border-top:1px solid #e2e8f0">
+            <div style="font-size:0.72rem;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">Outreach DM Template</div>
+            <p style="font-size:0.875rem;color:#334155;line-height:1.8">{_esc(dm_message) if dm_message else 'No message generated.'}</p>
           </div>
         </div>"""
 
@@ -311,20 +354,38 @@ def generate_report_html(profiles: list, base_url: str = "") -> str:
 </head>
 <body>
 <div class="report-header">
-  <h1>Instagram Creator Audit Report</h1>
-  <p>AI-powered premium creator analysis — identify leads and pitch your script writing services</p>
+  <h1>Creator Intelligence Report</h1>
+  <p>Structured analysis based on publicly observable posting patterns, hook quality, and engagement signals</p>
   <div class="report-meta">
     <div class="meta-item">Generated: {date_str}</div>
     <div class="meta-item">Profiles Analyzed: {len(profiles)}</div>
-    <div class="meta-item">Powered by Google Gemini AI</div>
+    <div class="meta-item">AI-Assisted Analysis</div>
   </div>
 </div>
 <div class="container">
   {cards_html}
   {hook_rewriter_section}
+  <div style="background:white;border:1px solid #e2e8f0;border-radius:16px;padding:28px 32px;margin-bottom:40px">
+    <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:16px">How This Analysis Works</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px">
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px">
+        <div style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px">Public Signal Analysis</div>
+        <div style="font-size:0.8rem;color:#475569;line-height:1.55">Insights are derived from publicly observable data — post captions, engagement counts, posting frequency, and profile bio information.</div>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px">
+        <div style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px">Directional Scoring</div>
+        <div style="font-size:0.8rem;color:#475569;line-height:1.55">Scores reflect observable patterns relative to creator tier and follower count. All outputs are directional estimates, not precise measurements.</div>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px">
+        <div style="font-size:0.7rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px">AI-Assisted Interpretation</div>
+        <div style="font-size:0.8rem;color:#475569;line-height:1.55">Recommendations are AI-generated from pattern analysis. They should be treated as informed suggestions, not guarantees of results.</div>
+      </div>
+    </div>
+    <div style="font-size:0.75rem;color:#94a3b8;line-height:1.55;border-top:1px solid #f1f5f9;padding-top:12px">Analysis accuracy depends on the volume and recency of publicly available posts. Reports based on fewer than 6 posts carry a lower confidence rating.</div>
+  </div>
 </div>
 <div class="report-footer">
-  <p>Generated by CreatorAudit — AI-Powered Instagram Lead Intelligence</p>
+  <p>Generated by CreatorAudit — Creator Growth Intelligence Platform</p>
 </div>
 </body>
 </html>"""
